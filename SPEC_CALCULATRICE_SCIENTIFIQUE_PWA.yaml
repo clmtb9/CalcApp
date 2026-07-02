@@ -1,0 +1,315 @@
+spec:
+  id: calculatrice_scientifique_pwa_clone
+  version: 1.0.0
+  source_reference: lib/pages/calculs/calcul_scientifique_page.dart
+  objective:
+    - Reproduce behavior exactly
+    - Reproduce layout and visual hierarchy exactly
+    - Reproduce keyboard and touch interactions exactly
+
+state:
+  expr: { type: string, default: "" }
+  cursorPos: { type: int, default: 0 }
+  angleMode: { type: enum, values: [deg, rad], default: deg }
+  exactMode: { type: bool, default: true }
+  shiftOn: { type: bool, default: false }
+  lastAns: { type: number_or_null, default: null }
+  isResult: { type: bool, default: false }
+  resultMain: { type: string, default: "" }
+  resultSub: { type: string, default: "" }
+  isError: { type: bool, default: false }
+  swipeDragStartX: { type: number_or_null, default: null }
+
+layout:
+  root:
+    type: column
+    children_order:
+      - header
+      - screen_card
+      - mode_strip
+      - keypad
+      - bottom_space
+    bottom_space_px: 16
+    keyboard_focus_required: true
+
+  header:
+    padding_bottom_px: 16
+    row:
+      gap_px: 12
+      back_button:
+        size_px: [36, 36]
+        border_radius_px: 10
+        border_width_px: 1
+        icon_size_px: 16
+      texts:
+        tag:
+          value: CALCULS
+          font_size_px: 11
+          font_weight: 500
+          letter_spacing_px: 1.5
+        title:
+          value: Calculatrice scientifique
+          font_size_px: 20
+          font_weight: 700
+          letter_spacing_px: -0.5
+
+  screen_card:
+    margin_bottom_px: 10
+    padding_px: 14
+    border_radius_px: 14
+    border_width_px: 1
+    internal_order:
+      - status_row
+      - expression_gap_6
+      - expression_area
+      - separator
+      - result_label
+      - result_gap_4
+      - render_zone
+      - result_main
+      - result_sub_if_any
+    expression_area:
+      min_height_px: 28
+      font_family: monospace
+      font_size_px: 15
+      line_height: 1.6
+    separator:
+      height_px: 1
+      margin_vertical_px: 8
+
+  mode_strip:
+    padding_bottom_px: 10
+    buttons:
+      count: 2
+      labels: [EXACT, DECIMAL]
+      equal_width: true
+      gap_px: 8
+      transition_ms: 150
+      padding_vertical_px: 6
+      border_radius_px: 8
+      border_width_px: 1
+
+  keypad:
+    rows: 7
+    cols: 5
+    horizontal_gap_px: 7
+    vertical_gap_px: 7
+    button_size_formula:
+      base: "(availableWidth - gap*(cols-1))/cols"
+      final: "base*0.82"
+    default_shape: circle
+    text_align: center
+
+palette:
+  screen: "#0a1628"
+  border: "#2d3e5f"
+  keyBase: "#2c2c2e"
+  exprFn: "#3498db"
+  exprInv: "#e6a817"
+  exprNum: "#ecf0f1"
+  exprOp: "#f39c12"
+  exprPar: "#7ecfff"
+  exprCst: "#2ecc71"
+  exprSci: "#9b59b6"
+  resultOk: "#2ecc71"
+  resultSub: "#5a7a6a"
+  resultErr: "#e74c3c"
+  eqBtn: "#e8703a"
+  shift: "#e8703a"
+  muted: "#7f8c8d"
+
+keypad_map:
+  - [sin, cos, tan, rad, deg]
+  - [log, ln, "(", ")", inv]
+  - ["!", AC, "%", backspace, divide]
+  - [sqrt, "7", "8", "9", times]
+  - ["^", "4", "5", "6", minus]
+  - [pi, "1", "2", "3", plus]
+  - [e, ".", "0", sci_E, equals]
+
+shift_mapping:
+  sin: asin
+  cos: acos
+  tan: atan
+  log: "10^("
+  ln: "exp("
+  sqrt: "^(2)"
+  consume_shift_after_insert: true
+
+input_rules:
+  insert:
+    behavior_after_result:
+      reset_if_insert_starts_with: [digit, "(", pi, e]
+      continue_with_ans_if_operator_and_lastAns: ["+", "-", "*", "/", "^"]
+    ans_substitution: "if v == ans and lastAns != null, insert (lastAns)"
+  delete:
+    operation: "remove char before cursorPos"
+  clear:
+    operation:
+      - expr = ""
+      - cursorPos = 0
+      - isResult = false
+      - resultMain = ""
+      - resultSub = ""
+      - isError = false
+  cursor:
+    left_right: true
+    home_end: true
+    tap_positioning: true
+    swipe_horizontal:
+      threshold_px: 6
+      step_formula: "round(dx/10)"
+
+normalization_pipeline:
+  ordered_steps:
+    - "Replace pi with 3.141592653589793"
+    - "Replace ans with (lastAns) if lastAns exists"
+    - "Scientific notation: aEb -> (a*10^b)"
+    - "Expand factorial for integer n where 0 <= n <= 20"
+    - "Implicit multiplication: 2( -> 2*("
+    - "Implicit multiplication: )4 -> )*4"
+    - "Implicit multiplication: 2e -> 2*e (without breaking exp())"
+    - "If angleMode=deg, wrap sin/cos/tan args with (pi/180)*x"
+    - "If angleMode=deg, transform asin/acos/atan to (180/pi)*f(x)"
+    - "ln( -> log("
+    - "exp( -> e^("
+
+evaluation:
+  engine_requirements:
+    - Parse normalized expression
+    - Bind constant e
+  outcomes:
+    parse_or_eval_failure:
+      resultMain: ""
+      resultSub: ""
+      isError: false
+    nan_or_infinite:
+      resultMain: "Indefini"
+      resultSub: ""
+      isError: true
+    valid:
+      isError: false
+      display_by_mode:
+        exactMode_true:
+          - Try pi representation
+          - Else try rational fraction
+          - If exact found: resultMain='= exact', resultSub='~ decimal'
+          - Else resultMain='= decimal', resultSub=''
+        exactMode_false:
+          - resultMain='= decimal'
+          - resultSub=''
+
+number_format:
+  rules:
+    - when_integer_and_abs_lt_1e15: "display integer"
+    - when_abs_lt_1e-4_or_gte_1e10: "8 significant digits"
+    - otherwise: "10 significant digits"
+
+exact_representation:
+  fraction:
+    denominator_range: [2, 1000]
+    epsilon: 1.0e-9
+  pi_expr:
+    integer_multiple_epsilon: 1.0e-9
+    fraction_denominator_range: [2, 20]
+    reduce_with_gcd: true
+
+rendering:
+  expression_line:
+    token_priority:
+      - asin
+      - acos
+      - atan
+      - exp
+      - sin
+      - cos
+      - tan
+      - log
+      - ln
+      - sqrt
+      - abs
+    token_colors:
+      inverse_functions: exprInv
+      normal_functions: exprFn
+      constants: exprCst
+      operators: exprOp
+      parentheses: exprPar
+      numbers: exprNum
+    cursor_blink:
+      width_px: 2
+      height_px: 15
+      period_ms: 1000
+      duty_cycle: 0.5
+
+  math_render_zone:
+    parser_precedence:
+      - add_sub
+      - mul_div_mod
+      - pow
+      - unary
+      - atom
+    ast_nodes:
+      - num
+      - const
+      - sci
+      - neg
+      - paren
+      - fact
+      - fn
+      - binop
+    visual_rules:
+      fraction_when_div_and_exactMode: true
+      exponent_when_pow: true
+      sqrt_with_overline: true
+      abs_with_vertical_bars: true
+      operator_symbols:
+        plus: "+"
+        minus: "-"
+        multiply: "x"
+        divide: "div"
+        modulo: "%"
+    fallback_on_render_parse_error: "show raw expression as monospace text"
+
+keyboard_physical:
+  key_events:
+    Enter: calc
+    NumpadEnter: calc
+    Backspace: delete
+    Escape: clear
+    ArrowLeft: cursor_left
+    ArrowRight: cursor_right
+    Home: cursor_start
+    End: cursor_end
+  char_events:
+    allowed_direct: "0123456789.+-*/()^%"
+    shortcuts:
+      p: pi
+      s: "sin( or asin( via shift"
+      c: "cos( or acos( via shift"
+      t: "tan( or atan( via shift"
+      l: "log("
+      n: "ln("
+      r: "sqrt("
+  shift_arrow_behavior:
+    left_with_shift: jump_to_start_then_shift_off
+    right_with_shift: jump_to_end_then_shift_off
+
+history:
+  autosave:
+    debounce_ms: 700
+    payload:
+      type: scientific
+      inputs: [expression, angleMode, exactMode]
+      results: [result_decimal_formatted, result_exact, result_approx]
+
+acceptance_criteria:
+  - Same inputs produce same resultMain/resultSub strings
+  - Same normalization order and regex behavior
+  - Parse-incomplete behavior is silent empty result
+  - Math error behavior is Indefini
+  - Same post-equals behavior (reset vs continue with ans)
+  - Shift is consumed after inverse insertion
+  - Same keypad layout, labels, and mappings
+  - Equivalent rendered fractions/exponents/sqrt visuals
+  - Same cursor tap/swipe behavior
+  - Same physical keyboard shortcuts and commands
