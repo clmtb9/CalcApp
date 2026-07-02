@@ -24,3 +24,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local Copilot/agent assets (keep local, do not publish)
+.agents/
+.github/prompts/
+.github/copilot-instructions.md
+skills-lock.json
+
+# Build/analysis artifacts
+dev-dist/
