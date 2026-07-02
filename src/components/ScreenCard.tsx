@@ -257,7 +257,6 @@ export function ScreenCard({
         >
           {state.angleMode.toUpperCase()}
         </button>
-        <span>EXACT</span>
         <button
           type="button"
           className="status-toggle-btn"
