@@ -39,7 +39,7 @@ export function Keypad({ shiftOn, onPress }: KeypadProps) {
   const holdTimeoutRef = useRef<number | null>(null)
   const holdIntervalRef = useRef<number | null>(null)
   const suppressClickRef = useRef(false)
-  const [buttonSize, setButtonSize] = useState(54)
+  const [buttonSize, setButtonSize] = useState(58)
   const [gaps, setGaps] = useState({ h: calcSpec.layout.keypad.horizontal_gap_px, v: calcSpec.layout.keypad.vertical_gap_px })
 
   const stopHoldRepeat = () => {
@@ -92,15 +92,15 @@ export function Keypad({ shiftOn, onPress }: KeypadProps) {
       const rows = calcSpec.layout.keypad.rows
       const viewportH = window.innerHeight
 
-      const compactFactor = viewportH <= 620 ? 0.56 : viewportH <= 700 ? 0.64 : viewportH <= 820 ? 0.78 : 1
-      const gap = Math.max(3, Math.round(calcSpec.layout.keypad.horizontal_gap_px * compactFactor))
-      const vGap = Math.max(3, Math.round(calcSpec.layout.keypad.vertical_gap_px * compactFactor))
+      const compactFactor = viewportH <= 620 ? 0.62 : viewportH <= 700 ? 0.72 : viewportH <= 820 ? 0.86 : 1
+      const gap = Math.max(2, Math.round(calcSpec.layout.keypad.horizontal_gap_px * compactFactor))
+      const vGap = Math.max(2, Math.round(calcSpec.layout.keypad.vertical_gap_px * compactFactor))
 
       const base = (width - gap * (cols - 1)) / cols
       const baseByHeight = (height - vGap * (rows - 1)) / rows
-      const fromWidth = base * 0.82
-      const fromHeight = baseByHeight * 0.96
-      const nextSize = Math.max(30, Math.min(fromWidth, fromHeight))
+      const fromWidth = base * 0.95
+      const fromHeight = baseByHeight * 0.98
+      const nextSize = Math.max(34, Math.min(fromWidth, fromHeight))
       setGaps({ h: gap, v: vGap })
       setButtonSize(nextSize)
     }
