@@ -8,6 +8,7 @@ const isPagesBuild = process.env.GITHUB_ACTIONS === 'true'
 const basePath = isPagesBuild ? `/${repoName}/` : '/'
 
 const pwaManifest: Partial<ManifestOptions> = {
+  id: basePath,
   name: 'Calculatrice scientifique',
   short_name: 'CalcSci',
   description: 'Clone PWA de la calculatrice scientifique specifiee par YAML.',
@@ -15,12 +16,19 @@ const pwaManifest: Partial<ManifestOptions> = {
   background_color: '#0a1628',
   display: 'standalone',
   start_url: basePath,
+  scope: basePath,
   icons: [
     {
-      src: '/icon.svg',
+      src: 'icon.svg',
       sizes: 'any',
       type: 'image/svg+xml',
-      purpose: 'any maskable',
+      purpose: 'any',
+    },
+    {
+      src: 'icon.svg',
+      sizes: 'any',
+      type: 'image/svg+xml',
+      purpose: 'maskable',
     },
   ],
 }
@@ -32,11 +40,11 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icon.svg'],
+      includeAssets: ['icon.svg', 'favicon.svg'],
       manifest: pwaManifest,
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
-        navigateFallback: '/index.html',
+        navigateFallback: `${basePath}index.html`,
         runtimeCaching: [
           {
             urlPattern: ({ request }) => request.destination === 'document',
