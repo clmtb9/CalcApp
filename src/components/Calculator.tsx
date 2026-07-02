@@ -4,7 +4,6 @@ import { ScreenCard } from './ScreenCard'
 import { Keypad } from './Keypad'
 import { SaveResultModal } from './SaveResultModal'
 import { useCalculator } from '../state/useCalculator'
-import { calcSpec } from '../spec/spec'
 import type { NoteItem } from '../notes/types'
 import type { RecentCalculation } from '../state/history'
 
@@ -44,6 +43,7 @@ export function Calculator({
   onSaveNamedResult,
 }: CalculatorProps) {
   const [saveModalOpen, setSaveModalOpen] = useState(false)
+  const [keyButtonSize, setKeyButtonSize] = useState(56)
   const { state, displayResult, dispatch, pressButton, pasteExpression } = useCalculator({
     disableKeyboardShortcuts: saveModalOpen,
     resumeCalculation,
@@ -79,9 +79,9 @@ export function Calculator({
         }}
       />
 
-      <Keypad shiftOn={state.shiftOn} onPress={pressButton} />
+      <Keypad shiftOn={state.shiftOn} onPress={pressButton} onButtonSizeChange={setKeyButtonSize} />
 
-      <div style={{ height: `${calcSpec.layout.root.bottom_space_px}px` }} />
+      <div style={{ height: `${Math.round(keyButtonSize / 2)}px`, flexShrink: 0 }} />
 
       <SaveResultModal
         open={saveModalOpen}

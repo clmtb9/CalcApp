@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { ExpressionLine } from '../rendering/ExpressionLine'
+import { MathExpressionView } from '../rendering/MathExpressionView'
 import type { CalcState } from '../state/types'
 import { OverflowMenu } from './OverflowMenu'
 
@@ -121,12 +122,30 @@ export function ScreenCard({
     }, 300)
   }
 
+  const handleMathPreviewTap = (event: React.PointerEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect()
+    const relativeX = event.clientX - rect.left
+    const safeX = Math.max(0, Math.min(relativeX, rect.width))
+    const ratio = rect.width > 0 ? safeX / rect.width : 0
+    const nextPos = Math.round(Math.max(0, Math.min(1, ratio)) * state.expr.length)
+    onSetCursor(nextPos)
+
+    setTapFeedbackOn(true)
+    if (tapTimeoutRef.current !== null) {
+      window.clearTimeout(tapTimeoutRef.current)
+    }
+    tapTimeoutRef.current = window.setTimeout(() => {
+      setTapFeedbackOn(false)
+    }, 300)
+  }
+
   const hasApproximation = Boolean(displayResult.resultSub.trim())
   const copyableResult = normalizeResultForCopy(displayResult.resultMain)
   const formatStatusLabel =
     state.resultFormat === 'scientific' ? 'SCI AUTO' : 'DECIMAL'
   const nextAngleMode = state.angleMode === 'deg' ? 'rad' : 'deg'
   const nextResultFormat = state.resultFormat === 'decimal' ? 'scientific' : 'decimal'
+  const scientificClass = state.resultFormat === 'scientific' ? 'result-main-scientific' : ''
 
   const clearResultLongPress = () => {
     if (resultLongPressTimerRef.current !== null) {
@@ -295,52 +314,75 @@ export function ScreenCard({
         <div className={pasteFeedbackOn ? 'paste-feedback paste-feedback-on' : 'paste-feedback'}>COLLE</div>
       </div>
 
+      <div className="expression-math-preview" onPointerDown={handleMathPreviewTap}>
+        <MathExpressionView expression={state.expr} exactMode={state.exactMode} />
+      </div>
+
       <div className="separator" />
 
-      <div className="result-label">RESULTAT</div>
-      <div className="result-gap" />
-
-      <div
-        className={
-          displayResult.isError
-            ? resultCopiedOn
-              ? 'result-main result-main-error result-main-copied result-main-copy-ready'
-              : 'result-main result-main-error result-main-copy-ready'
-            : resultCopiedOn
-              ? 'result-main result-main-copied result-main-copy-ready'
-              : 'result-main result-main-copy-ready'
-        }
-        onPointerDown={() => {
-          if (!copyableResult) {
-            return
+      <div className="result-zone">
+        <div
+          className={
+            displayResult.isError
+              ? resultCopiedOn
+                ? hasApproximation
+                  ? `result-main result-main-error result-main-has-approx ${scientificClass} result-main-copied result-main-copy-ready`
+                  : `result-main result-main-error ${scientificClass} result-main-copied result-main-copy-ready`
+                : hasApproximation
+                  ? `result-main result-main-error result-main-has-approx ${scientificClass} result-main-copy-ready`
+                  : `result-main result-main-error ${scientificClass} result-main-copy-ready`
+              : resultCopiedOn
+                ? hasApproximation
+                  ? `result-main result-main-has-approx ${scientificClass} result-main-copied result-main-copy-ready`
+                  : `result-main ${scientificClass} result-main-copied result-main-copy-ready`
+                : hasApproximation
+                  ? `result-main result-main-has-approx ${scientificClass} result-main-copy-ready`
+                  : `result-main ${scientificClass} result-main-copy-ready`
           }
-          skipNextResultClickRef.current = false
-          clearResultLongPress()
-          resultLongPressTimerRef.current = window.setTimeout(async () => {
-            const ok = await copyTextToClipboard(copyableResult)
-            if (ok) {
-              triggerCopyFeedback()
-              skipNextResultClickRef.current = true
+          onPointerDown={() => {
+            if (!copyableResult) {
+              return
             }
-            resultLongPressTimerRef.current = null
-          }, RESULT_LONG_PRESS_MS)
-        }}
-        onPointerUp={clearResultLongPress}
-        onPointerLeave={clearResultLongPress}
-        onPointerCancel={clearResultLongPress}
-        onClick={() => {
-          if (skipNextResultClickRef.current) {
             skipNextResultClickRef.current = false
-            return
-          }
-          onSetResultFormat(nextResultFormat)
-        }}
-        onDoubleClick={() => onResultDoubleClick?.()}
-        title={copyableResult ? 'Appui long pour copier le resultat' : undefined}
-      >
-        {displayResult.resultMain || ' '}
+            clearResultLongPress()
+            resultLongPressTimerRef.current = window.setTimeout(async () => {
+              const ok = await copyTextToClipboard(copyableResult)
+              if (ok) {
+                triggerCopyFeedback()
+                skipNextResultClickRef.current = true
+              }
+              resultLongPressTimerRef.current = null
+            }, RESULT_LONG_PRESS_MS)
+          }}
+          onPointerUp={clearResultLongPress}
+          onPointerLeave={clearResultLongPress}
+          onPointerCancel={clearResultLongPress}
+          onClick={() => {
+            if (skipNextResultClickRef.current) {
+              skipNextResultClickRef.current = false
+              return
+            }
+            onSetResultFormat(nextResultFormat)
+          }}
+          onDoubleClick={() => onResultDoubleClick?.()}
+          title={copyableResult ? 'Appui long pour copier le resultat' : undefined}
+        >
+          {displayResult.resultMain || ' '}
+        </div>
+
+        <div
+          className={hasApproximation ? 'result-sub result-sub-visible result-sub-switchable' : 'result-sub'}
+          onClick={() => {
+            if (!hasApproximation) {
+              return
+            }
+            onSetResultFormat(nextResultFormat)
+          }}
+          title={hasApproximation ? `Basculer vers ${nextResultFormat === 'scientific' ? 'SCI AUTO' : 'DECIMAL'}` : undefined}
+        >
+          {hasApproximation ? displayResult.resultSub : ' '}
+        </div>
       </div>
-      <div className={hasApproximation ? 'result-sub result-sub-visible' : 'result-sub'}>{displayResult.resultSub || ' '}</div>
     </section>
   )
 }

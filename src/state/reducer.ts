@@ -93,6 +93,22 @@ export function calcReducer(state: CalcState, action: CalcAction): CalcState {
       if (state.cursorPos <= 0 || state.expr.length === 0) {
         return clearResults(state)
       }
+
+      // If cursor is right after an incomplete function opening (e.g. ln(, sqrt(), sin()),
+      // remove the whole function scaffold in one backspace.
+      const beforeCursor = state.expr.slice(0, state.cursorPos)
+      const functionOpenMatch = beforeCursor.match(/([a-zA-Z_][a-zA-Z0-9_]*)\($/)
+      if (functionOpenMatch) {
+        const start = state.cursorPos - functionOpenMatch[0].length
+        const end = state.cursorPos + (state.expr.slice(state.cursorPos, state.cursorPos + 1) === ')' ? 1 : 0)
+        const nextExpr = `${state.expr.slice(0, start)}${state.expr.slice(end)}`
+        return {
+          ...clearResults(state),
+          expr: nextExpr,
+          cursorPos: clampCursor(start, nextExpr),
+        }
+      }
+
       const nextExpr = `${state.expr.slice(0, state.cursorPos - 1)}${state.expr.slice(state.cursorPos)}`
       return {
         ...clearResults(state),

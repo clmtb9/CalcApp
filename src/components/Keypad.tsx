@@ -4,6 +4,7 @@ import { calcSpec, keypadMap } from '../spec/spec'
 interface KeypadProps {
   shiftOn: boolean
   onPress: (label: string) => void
+  onButtonSizeChange?: (size: number) => void
 }
 
 const OPERATOR_KEYS = new Set(['divide', 'times', 'minus', 'plus', '^', '%', 'sci_E', '.', '(', ')'])
@@ -34,7 +35,7 @@ function getKeyToneClass(label: string): string {
   return 'key-tone-op'
 }
 
-export function Keypad({ shiftOn, onPress }: KeypadProps) {
+export function Keypad({ shiftOn, onPress, onButtonSizeChange }: KeypadProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const holdTimeoutRef = useRef<number | null>(null)
   const holdIntervalRef = useRef<number | null>(null)
@@ -103,13 +104,14 @@ export function Keypad({ shiftOn, onPress }: KeypadProps) {
       const nextSize = Math.max(34, Math.min(fromWidth, fromHeight))
       setGaps({ h: gap, v: vGap })
       setButtonSize(nextSize)
+      onButtonSizeChange?.(nextSize)
     }
 
     update()
     const observer = new ResizeObserver(update)
     observer.observe(element)
     return () => observer.disconnect()
-  }, [])
+  }, [onButtonSizeChange])
 
   return (
     <div
@@ -140,7 +142,7 @@ export function Keypad({ shiftOn, onPress }: KeypadProps) {
             style={{
               width: `${buttonSize}px`,
               height: `${buttonSize}px`,
-              fontSize: `${Math.max(12, Math.min(16, Math.round(buttonSize * 0.34)))}px`,
+              fontSize: `${resolveKeyFontSize(buttonSize, label)}px`,
             }}
             onPointerDown={() => startHoldRepeat(label)}
             onPointerUp={stopHoldRepeat}
@@ -160,6 +162,17 @@ export function Keypad({ shiftOn, onPress }: KeypadProps) {
       })}
     </div>
   )
+}
+
+function resolveKeyFontSize(buttonSize: number, label: string): number {
+  const isDigit = /^\d+$/.test(label)
+  const isPrimaryOperator = label === 'plus' || label === 'minus' || label === 'times' || label === 'divide' || label === 'equals'
+
+  if (isDigit || isPrimaryOperator) {
+    return Math.max(16, Math.min(24, Math.round(buttonSize * 0.44)))
+  }
+
+  return Math.max(12, Math.min(16, Math.round(buttonSize * 0.34)))
 }
 
 function resolveKeyActionLabel(raw: string): string {

@@ -2,6 +2,7 @@ export type AstNode =
   | { type: 'num'; value: number; raw: string }
   | { type: 'const'; name: string }
   | { type: 'sci'; mantissa: number; exponent: number; raw: string }
+  | { type: 'empty' }
   | { type: 'neg'; value: AstNode }
   | { type: 'paren'; value: AstNode }
   | { type: 'fact'; value: AstNode }
@@ -120,7 +121,13 @@ export function parseMathExpression(input: string): AstNode {
       const next = peek()
       if (next && next.type === 'paren' && next.value === '(') {
         consume()
-        const arg = parseAddSub()
+        let arg: AstNode
+        const maybeClose = peek()
+        if (maybeClose && maybeClose.type === 'paren' && maybeClose.value === ')') {
+          arg = { type: 'empty' }
+        } else {
+          arg = parseAddSub()
+        }
         const close = consume()
         if (close.type !== 'paren' || close.value !== ')') {
           throw new Error('Missing closing parenthesis in function')
@@ -137,7 +144,13 @@ export function parseMathExpression(input: string): AstNode {
         }
       }
     } else if (token.type === 'paren' && token.value === '(') {
-      const inside = parseAddSub()
+      let inside: AstNode
+      const maybeClose = peek()
+      if (maybeClose && maybeClose.type === 'paren' && maybeClose.value === ')') {
+        inside = { type: 'empty' }
+      } else {
+        inside = parseAddSub()
+      }
       const close = consume()
       if (close.type !== 'paren' || close.value !== ')') {
         throw new Error('Missing closing parenthesis')

@@ -35,6 +35,9 @@ function renderNode(node: AstNode, exactMode: boolean): ReactElement {
         </span>
       )
 
+    case 'empty':
+      return <span className="math-empty-arg" />
+
     case 'neg':
       return (
         <span>
@@ -61,7 +64,9 @@ function renderNode(node: AstNode, exactMode: boolean): ReactElement {
         return (
           <span className="sqrt-wrap">
             <span className="sqrt-sign">√</span>
-            <span className="sqrt-body">{renderNode(node.arg, exactMode)}</span>
+            <span className={node.arg.type === 'empty' ? 'sqrt-body sqrt-body-empty' : 'sqrt-body'}>
+              {renderNode(node.arg, exactMode)}
+            </span>
           </span>
         )
       }
