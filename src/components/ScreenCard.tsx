@@ -1,9 +1,11 @@
 import { useRef, useState } from 'react'
 import { ExpressionLine } from '../rendering/ExpressionLine'
 import type { CalcState } from '../state/types'
+import { OverflowMenu } from './OverflowMenu'
 
 const RESULT_LONG_PRESS_MS = 500
 const DECIMAL_LABEL_LONG_PRESS_MS = 500
+const EXPRESSION_LONG_PRESS_MS = 500
 
 function normalizeResultForCopy(value: string): string {
   return value.replace(/^=\s*/, '').replace(/^≈\s*/, '').trim()
@@ -42,6 +44,10 @@ interface ScreenCardProps {
     resultSub: string
     isError: boolean
   }
+  activeTab: 'calculator' | 'notes' | 'formulas'
+  isOffline: boolean
+  onNavigateTab: (tab: 'calculator' | 'notes' | 'formulas') => void
+  onRefreshApp: () => void
   onSetAngleMode: (mode: 'deg' | 'rad') => void
   onSetResultFormat: (format: 'decimal' | 'scientific') => void
   onSetResultPrecision: (precision: number) => void
@@ -49,12 +55,17 @@ interface ScreenCardProps {
   onSwipeStart: (x: number) => void
   onSwipeMove: (x: number) => void
   onSwipeEnd: () => void
+  onPasteExpression: (value: string) => void
   onResultDoubleClick?: () => void
 }
 
 export function ScreenCard({
   state,
   displayResult,
+  activeTab,
+  isOffline,
+  onNavigateTab,
+  onRefreshApp,
   onSetAngleMode,
   onSetResultFormat,
   onSetResultPrecision,
@@ -62,16 +73,22 @@ export function ScreenCard({
   onSwipeStart,
   onSwipeMove,
   onSwipeEnd,
+  onPasteExpression,
   onResultDoubleClick,
 }: ScreenCardProps) {
   const [tapFeedbackOn, setTapFeedbackOn] = useState(false)
   const [resultCopiedOn, setResultCopiedOn] = useState(false)
+  const [pasteFeedbackOn, setPasteFeedbackOn] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
   const tapTimeoutRef = useRef<number | null>(null)
   const resultCopyTimeoutRef = useRef<number | null>(null)
+  const pasteFeedbackTimeoutRef = useRef<number | null>(null)
   const resultLongPressTimerRef = useRef<number | null>(null)
   const decimalLongPressTimerRef = useRef<number | null>(null)
+  const expressionLongPressTimerRef = useRef<number | null>(null)
   const skipNextFormatClickRef = useRef(false)
   const skipNextResultClickRef = useRef(false)
+  const skipNextExpressionTapRef = useRef(false)
 
   const handleTapPosition = (event: React.PointerEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect()
@@ -125,6 +142,41 @@ export function ScreenCard({
     }
   }
 
+  const clearExpressionLongPress = () => {
+    if (expressionLongPressTimerRef.current !== null) {
+      window.clearTimeout(expressionLongPressTimerRef.current)
+      expressionLongPressTimerRef.current = null
+    }
+  }
+
+  const handleExpressionLongPressStart = () => {
+    clearExpressionLongPress()
+    skipNextExpressionTapRef.current = false
+    expressionLongPressTimerRef.current = window.setTimeout(async () => {
+      let pasted = ''
+      try {
+        if (navigator.clipboard?.readText) {
+          pasted = await navigator.clipboard.readText()
+        }
+      } catch {
+        // Fallback prompt below when clipboard read is denied.
+      }
+
+      if (!pasted.trim()) {
+        const manual = window.prompt('Coller une expression')
+        pasted = manual ?? ''
+      }
+
+      if (pasted.trim()) {
+        onPasteExpression(pasted)
+        triggerPasteFeedback()
+        skipNextExpressionTapRef.current = true
+      }
+
+      expressionLongPressTimerRef.current = null
+    }, EXPRESSION_LONG_PRESS_MS)
+  }
+
   const handleDecimalLongPressStart = () => {
     if (state.resultFormat !== 'decimal') {
       return
@@ -160,6 +212,21 @@ export function ScreenCard({
     }, 800)
   }
 
+  const triggerPasteFeedback = () => {
+    setPasteFeedbackOn(true)
+    if (pasteFeedbackTimeoutRef.current !== null) {
+      window.clearTimeout(pasteFeedbackTimeoutRef.current)
+    }
+    pasteFeedbackTimeoutRef.current = window.setTimeout(() => {
+      setPasteFeedbackOn(false)
+    }, 800)
+  }
+
+  const handleNavigate = (tab: 'calculator' | 'notes' | 'formulas') => {
+    setMenuOpen(false)
+    onNavigateTab(tab)
+  }
+
   return (
     <section className="screen-card">
       <div className="status-row">
@@ -184,26 +251,48 @@ export function ScreenCard({
         >
           {formatStatusLabel}
         </button>
-        <span className={state.shiftOn ? 'shift-on' : 'shift-off'}>{state.shiftOn ? 'INV ON' : 'INV OFF'}</span>
+        <OverflowMenu
+          activeTab={activeTab}
+          isOffline={isOffline}
+          open={menuOpen}
+          onToggle={() => setMenuOpen((v) => !v)}
+          onNavigateTab={handleNavigate}
+          onRefreshApp={onRefreshApp}
+        />
       </div>
 
       <div className="expression-gap" />
 
-      <div
-        className={tapFeedbackOn ? 'expression-area expression-area-tap' : 'expression-area'}
-        onPointerDown={(event) => {
-          handleTapPosition(event)
-          onSwipeStart(event.clientX)
-        }}
-        onPointerMove={(event) => {
-          if (event.buttons === 1) {
-            onSwipeMove(event.clientX)
-          }
-        }}
-        onPointerUp={onSwipeEnd}
-        onPointerCancel={onSwipeEnd}
-      >
-        <ExpressionLine expr={state.expr} cursorPos={state.cursorPos} />
+      <div className="expression-wrap">
+        <div
+          className={tapFeedbackOn ? 'expression-area expression-area-tap' : 'expression-area'}
+          onPointerDown={(event) => {
+            handleExpressionLongPressStart()
+            if (skipNextExpressionTapRef.current) {
+              return
+            }
+            handleTapPosition(event)
+            onSwipeStart(event.clientX)
+          }}
+          onPointerMove={(event) => {
+            clearExpressionLongPress()
+            if (event.buttons === 1) {
+              onSwipeMove(event.clientX)
+            }
+          }}
+          onPointerUp={() => {
+            clearExpressionLongPress()
+            onSwipeEnd()
+          }}
+          onPointerCancel={() => {
+            clearExpressionLongPress()
+            onSwipeEnd()
+          }}
+          onPointerLeave={clearExpressionLongPress}
+        >
+          <ExpressionLine expr={state.expr} cursorPos={state.cursorPos} />
+        </div>
+        <div className={pasteFeedbackOn ? 'paste-feedback paste-feedback-on' : 'paste-feedback'}>COLLE</div>
       </div>
 
       <div className="separator" />

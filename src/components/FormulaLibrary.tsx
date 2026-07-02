@@ -1,3 +1,6 @@
+import { useState } from 'react'
+import { OverflowMenu } from './OverflowMenu'
+
 interface FormulaItem {
   id: string
   label: string
@@ -48,13 +51,34 @@ const FORMULAS: FormulaItem[] = [
 
 interface FormulaLibraryProps {
   onUseFormula: (payload: { expression: string; angleMode?: 'deg' | 'rad' }) => void
+  activeTab: 'calculator' | 'notes' | 'formulas'
+  isOffline: boolean
+  onNavigateTab: (tab: 'calculator' | 'notes' | 'formulas') => void
+  onRefreshApp: () => void
 }
 
-export function FormulaLibrary({ onUseFormula }: FormulaLibraryProps) {
+export function FormulaLibrary({ onUseFormula, activeTab, isOffline, onNavigateTab, onRefreshApp }: FormulaLibraryProps) {
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  const handleNavigate = (tab: 'calculator' | 'notes' | 'formulas') => {
+    setMenuOpen(false)
+    onNavigateTab(tab)
+  }
+
   return (
     <section className="formulas-root" aria-label="Bibliotheque de formules">
       <div className="formulas-card">
-        <div className="formulas-title">Mini bibliotheque formules</div>
+        <div className="formulas-title-row">
+          <div className="formulas-title">Mini bibliotheque formules</div>
+          <OverflowMenu
+            activeTab={activeTab}
+            isOffline={isOffline}
+            open={menuOpen}
+            onToggle={() => setMenuOpen((v) => !v)}
+            onNavigateTab={handleNavigate}
+            onRefreshApp={onRefreshApp}
+          />
+        </div>
         <div className="formulas-list">
           {FORMULAS.map((item) => (
             <article key={item.id} className="formula-item">

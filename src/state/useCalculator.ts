@@ -604,6 +604,16 @@ export function useCalculator(options: UseCalculatorOptions = {}) {
       state,
       displayResult,
       dispatch,
+      pasteExpression: (raw: string) => {
+        const normalized = normalizePastedExpression(raw)
+        if (!normalized) {
+          return
+        }
+        if (stateRef.current.isResult) {
+          dispatch({ type: 'CLEAR' })
+        }
+        dispatch({ type: 'INSERT', value: normalized, kind: 'symbol' })
+      },
       pressButton: (label: string) => {
         if (label === 'equals') {
           dispatch({ type: 'CALCULATE' })

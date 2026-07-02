@@ -56,44 +56,16 @@ function App() {
 
   return (
     <div className="app-shell">
-      <nav className="top-tabs" aria-label="Navigation principale">
-        <button
-          type="button"
-          className={activeTab === 'calculator' ? 'top-tab top-tab-active' : 'top-tab'}
-          onClick={() => setActiveTab('calculator')}
-        >
-          Calculatrice
-        </button>
-        <button
-          type="button"
-          className={activeTab === 'notes' ? 'top-tab top-tab-active' : 'top-tab'}
-          onClick={() => setActiveTab('notes')}
-        >
-          Notes
-        </button>
-        <button
-          type="button"
-          className={activeTab === 'formulas' ? 'top-tab top-tab-active' : 'top-tab'}
-          onClick={() => setActiveTab('formulas')}
-        >
-          Formules
-        </button>
-        <button type="button" className="top-tab top-tab-maj" onClick={handleMaj} title="Rafraichir l'application">
-          MAJ
-        </button>
-        {isOffline ? (
-          <span className="offline-badge" role="status" aria-live="polite" title="Application hors ligne">
-            Offline
-          </span>
-        ) : null}
-      </nav>
-
       {activeTab === 'calculator' ? (
         <Calculator
           notes={notes}
           targetNoteId={activeNoteId}
           resumeCalculation={resumeCalculation}
           resumeFromNote={resumeFromNote}
+          activeTab={activeTab}
+          isOffline={isOffline}
+          onNavigateTab={setActiveTab}
+          onRefreshApp={handleMaj}
           onSaveNamedResult={(payload) => {
             const snapshot = {
               label: payload.label,
@@ -123,6 +95,10 @@ function App() {
         <NotesPanel
           notes={notes}
           activeNoteId={activeNote?.id ?? activeNoteId}
+          activeTab={activeTab}
+          isOffline={isOffline}
+          onNavigateTab={setActiveTab}
+          onRefreshApp={handleMaj}
           onSetActiveNote={setActiveNoteId}
           onCreateNote={() => createNote()}
           onDeleteNote={deleteNote}
@@ -138,6 +114,10 @@ function App() {
         />
       ) : (
         <FormulaLibrary
+          activeTab={activeTab}
+          isOffline={isOffline}
+          onNavigateTab={setActiveTab}
+          onRefreshApp={handleMaj}
           onUseFormula={(payload) => {
             setResumeFromNote({ expression: payload.expression, angleMode: payload.angleMode })
             setActiveTab('calculator')

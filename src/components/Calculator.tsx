@@ -13,6 +13,10 @@ interface CalculatorProps {
   targetNoteId: string
   resumeCalculation: RecentCalculation | null
   resumeFromNote: { expression: string; angleMode?: 'deg' | 'rad' } | null
+  activeTab: 'calculator' | 'notes' | 'formulas'
+  isOffline: boolean
+  onNavigateTab: (tab: 'calculator' | 'notes' | 'formulas') => void
+  onRefreshApp: () => void
   onSaveNamedResult: (payload: {
     noteId?: string
     newNoteTitle?: string
@@ -28,9 +32,19 @@ interface CalculatorProps {
   }) => void
 }
 
-export function Calculator({ notes, targetNoteId, resumeCalculation, resumeFromNote, onSaveNamedResult }: CalculatorProps) {
+export function Calculator({
+  notes,
+  targetNoteId,
+  resumeCalculation,
+  resumeFromNote,
+  activeTab,
+  isOffline,
+  onNavigateTab,
+  onRefreshApp,
+  onSaveNamedResult,
+}: CalculatorProps) {
   const [saveModalOpen, setSaveModalOpen] = useState(false)
-  const { state, displayResult, dispatch, pressButton } = useCalculator({
+  const { state, displayResult, dispatch, pressButton, pasteExpression } = useCalculator({
     disableKeyboardShortcuts: saveModalOpen,
     resumeCalculation,
     resumeFromNote,
@@ -53,6 +67,11 @@ export function Calculator({ notes, targetNoteId, resumeCalculation, resumeFromN
         onSwipeStart={(x) => dispatch({ type: 'SWIPE_START', x })}
         onSwipeMove={(x) => dispatch({ type: 'SWIPE_MOVE', x })}
         onSwipeEnd={() => dispatch({ type: 'SWIPE_END' })}
+        onPasteExpression={pasteExpression}
+        activeTab={activeTab}
+        isOffline={isOffline}
+        onNavigateTab={onNavigateTab}
+        onRefreshApp={onRefreshApp}
         onResultDoubleClick={() => {
           if (canSaveResult) {
             setSaveModalOpen(true)

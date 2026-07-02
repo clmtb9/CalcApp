@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { NoteItem } from '../notes/types'
 import { readRecentCalculations, type RecentCalculation } from '../state/history'
+import { OverflowMenu } from './OverflowMenu'
 
 const NOTES_SCREEN_STORAGE_KEY = 'calc-notes-screen-mode'
 
@@ -219,6 +220,10 @@ function formatEditorHtml(content: string, searchTerm: string): string {
 interface NotesPanelProps {
   notes: NoteItem[]
   activeNoteId: string
+  activeTab: 'calculator' | 'notes' | 'formulas'
+  isOffline: boolean
+  onNavigateTab: (tab: 'calculator' | 'notes' | 'formulas') => void
+  onRefreshApp: () => void
   onSetActiveNote: (id: string) => void
   onCreateNote: () => void
   onDeleteNote: (id: string) => void
@@ -230,6 +235,10 @@ interface NotesPanelProps {
 export function NotesPanel({
   notes,
   activeNoteId,
+  activeTab,
+  isOffline,
+  onNavigateTab,
+  onRefreshApp,
   onSetActiveNote,
   onCreateNote,
   onDeleteNote,
@@ -245,6 +254,7 @@ export function NotesPanel({
   const [showRecentCalculations, setShowRecentCalculations] = useState(false)
   const [recentCalculations, setRecentCalculations] = useState<RecentCalculation[]>([])
   const [showOptionsMenu, setShowOptionsMenu] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
   const contentEditorRef = useRef<HTMLDivElement | null>(null)
   const optionsMenuRef = useRef<HTMLDivElement | null>(null)
   const formatDebounceRef = useRef<number | null>(null)
@@ -262,6 +272,11 @@ export function NotesPanel({
   }, [notes, searchTerm])
 
   const active = notes.find((note) => note.id === activeNoteId) ?? notes[0]
+
+  const handleNavigate = (tab: 'calculator' | 'notes' | 'formulas') => {
+    setMenuOpen(false)
+    onNavigateTab(tab)
+  }
 
   useEffect(() => {
     localStorage.setItem(NOTES_SCREEN_STORAGE_KEY, notesScreen)
@@ -378,17 +393,27 @@ export function NotesPanel({
         {notesScreen === 'list' ? (
           <section className="notes-selection-screen">
             <div className="notes-list-actions">
-              <div className="note-actions-grid">
-                <button
-                  type="button"
-                  className="note-btn"
-                  onClick={() => {
-                    onCreateNote()
-                    setNotesScreen('preview')
-                  }}
-                >
-                  + Nouvelle note
-                </button>
+              <div className="notes-list-topbar">
+                <div className="note-actions-grid">
+                  <button
+                    type="button"
+                    className="note-btn"
+                    onClick={() => {
+                      onCreateNote()
+                      setNotesScreen('preview')
+                    }}
+                  >
+                    + Nouvelle note
+                  </button>
+                </div>
+                <OverflowMenu
+                  activeTab={activeTab}
+                  isOffline={isOffline}
+                  open={menuOpen}
+                  onToggle={() => setMenuOpen((value) => !value)}
+                  onNavigateTab={handleNavigate}
+                  onRefreshApp={onRefreshApp}
+                />
               </div>
               <input
                 className="note-search-input"
@@ -431,19 +456,29 @@ export function NotesPanel({
               />
 
               <div className="note-options-wrap" ref={optionsMenuRef}>
+                <OverflowMenu
+                  activeTab={activeTab}
+                  isOffline={isOffline}
+                  open={menuOpen}
+                  onToggle={() => setMenuOpen((value) => !value)}
+                  onNavigateTab={handleNavigate}
+                  onRefreshApp={onRefreshApp}
+                />
                 <button
                   type="button"
-                  className="note-btn note-options-btn"
+                  className="status-menu-btn note-options-btn"
+                  aria-haspopup="menu"
+                  aria-expanded={showOptionsMenu}
                   aria-label="Options"
                   onClick={() => setShowOptionsMenu((value) => !value)}
                 >
                   ...
                 </button>
                 {showOptionsMenu ? (
-                  <div className="note-options-menu" role="menu" aria-label="Options note">
+                  <div className="status-menu-panel status-menu-panel-open note-options-menu" role="menu" aria-label="Options note">
                     <button
                       type="button"
-                      className="note-options-item"
+                      className="status-menu-item note-options-item"
                       role="menuitem"
                       onClick={async () => {
                         setShowOptionsMenu(false)
@@ -454,7 +489,7 @@ export function NotesPanel({
                     </button>
                     <button
                       type="button"
-                      className="note-options-item note-options-item-danger"
+                      className="status-menu-item note-options-item note-options-item-danger"
                       role="menuitem"
                       onClick={() => {
                         if (notes.length === 1) {

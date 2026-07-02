@@ -196,6 +196,15 @@ function displayLabel(raw: string, shiftOn: boolean): string {
   if (shiftOn && raw === 'tan') {
     return 'atan'
   }
+  if (shiftOn && raw === 'log') {
+    return '10^'
+  }
+  if (shiftOn && raw === 'ln') {
+    return 'e^x'
+  }
+  if (shiftOn && raw === 'sqrt') {
+    return 'x²'
+  }
 
   return labels[raw] ?? raw
 }

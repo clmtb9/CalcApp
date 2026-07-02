@@ -45,53 +45,6 @@ body {
   min-height: 100svh;
 }
 
-.top-tabs {
-  width: min(100%, 460px);
-  margin: 0 auto;
-  padding: 10px 16px 0;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr auto auto;
-  gap: 8px;
-  align-items: center;
-}
-
-.top-tab {
-  height: 36px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--screen) 95%, #1d3555 5%);
-  color: var(--muted);
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 600;
-}
-
-.top-tab-active {
-  color: var(--expr-num);
-  background: color-mix(in srgb, var(--border) 60%, transparent 40%);
-}
-
-.top-tab-maj {
-  min-width: 62px;
-  font-weight: 700;
-  color: #ffe0a8;
-  border-color: color-mix(in srgb, #f39c12 45%, var(--border) 55%);
-}
-
-.offline-badge {
-  justify-self: end;
-  height: 28px;
-  padding: 0 10px;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, #e74c3c 60%, var(--border) 40%);
-  background: color-mix(in srgb, #2b0e12 80%, var(--screen) 20%);
-  color: #ffb3b3;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.4px;
-  display: inline-flex;
-  align-items: center;
-}
-
 .calc-root {
   width: min(100%, 460px);
   margin: 0 auto;
@@ -147,6 +100,7 @@ body {
   justify-content: space-between;
   font-size: 12px;
   color: var(--muted);
+  position: relative;
 }
 
 .status-toggle-btn {
@@ -166,16 +120,78 @@ body {
   border-color: color-mix(in srgb, var(--expr-par) 55%, var(--border) 45%);
 }
 
-.shift-on {
-  color: var(--shift);
+.status-menu-wrap {
+  position: relative;
 }
 
-.shift-off {
-  color: var(--muted);
+.status-menu-btn {
+  width: 28px;
+  height: 22px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--border) 65%, transparent 35%);
+  background: color-mix(in srgb, var(--screen) 90%, #1d3555 10%);
+  color: var(--expr-num);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 16px;
+  line-height: 18px;
+  font-weight: 700;
+}
+
+.status-menu-panel {
+  position: absolute;
+  top: 28px;
+  right: 0;
+  min-width: 146px;
+  padding: 6px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--screen) 94%, #1f344f 6%);
+  display: none;
+  z-index: 5;
+}
+
+.status-menu-panel-open {
+  display: grid;
+  gap: 4px;
+}
+
+.status-menu-item {
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--expr-num);
+  text-align: left;
+  padding: 0 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-menu-item-active {
+  border-color: color-mix(in srgb, var(--expr-par) 45%, var(--border) 55%);
+  background: color-mix(in srgb, var(--border) 30%, transparent 70%);
+}
+
+.status-menu-offline {
+  margin-top: 2px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, #e74c3c 60%, var(--border) 40%);
+  background: color-mix(in srgb, #2b0e12 80%, var(--screen) 20%);
+  color: #ffb3b3;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  line-height: 22px;
+  text-align: center;
 }
 
 .expression-gap {
   height: 6px;
+}
+
+.expression-wrap {
+  position: relative;
 }
 
 .expression-area {
@@ -197,6 +213,30 @@ body {
 .expression-area-tap .cursor-blink {
   background: var(--expr-par);
   box-shadow: 0 0 8px color-mix(in srgb, var(--expr-par) 55%, transparent 45%);
+}
+
+.paste-feedback {
+  position: absolute;
+  right: 6px;
+  top: -18px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--result-ok) 45%, var(--border) 55%);
+  background: color-mix(in srgb, var(--screen) 88%, #1f344f 12%);
+  color: color-mix(in srgb, var(--result-ok) 70%, white 30%);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  opacity: 0;
+  transform: translateY(2px);
+  transition: opacity 140ms ease, transform 140ms ease;
+  pointer-events: none;
+}
+
+.paste-feedback-on {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .separator {
@@ -535,6 +575,20 @@ body {
   color: var(--expr-par);
 }
 
+.formulas-title-row {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.formulas-title-row .formulas-title {
+  padding: 0;
+  border-bottom: 0;
+}
+
 .formulas-list {
   min-height: 0;
   overflow: auto;
@@ -628,11 +682,18 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
+.notes-list-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 .note-actions-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 6px;
-  margin-bottom: 8px;
+  margin-bottom: 0;
 }
 
 .note-file-input {
@@ -744,39 +805,23 @@ body {
 }
 
 .note-options-btn {
-  width: 42px;
-  min-width: 42px;
-  font-size: 20px;
+  width: 28px;
+  min-width: 28px;
+  font-size: 16px;
   line-height: 1;
   padding: 0;
 }
 
 .note-options-menu {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 6px);
   min-width: 210px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--screen) 95%, #1d3555 5%);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
-  overflow: hidden;
+  top: 28px;
   z-index: 20;
 }
 
 .note-options-item {
   width: 100%;
-  border: 0;
-  background: transparent;
-  color: var(--expr-num);
   text-align: left;
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 13px;
-  padding: 10px;
-}
-
-.note-options-item:hover {
-  background: color-mix(in srgb, var(--border) 45%, transparent 55%);
+  height: 34px;
 }
 
 .note-options-item-danger {
