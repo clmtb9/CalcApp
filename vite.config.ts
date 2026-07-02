@@ -3,6 +3,10 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import type { ManifestOptions } from 'vite-plugin-pwa'
 
+const repoName = process.env.GITHUB_REPOSITORY?.split('/')[1] ?? 'CalcApp'
+const isPagesBuild = process.env.GITHUB_ACTIONS === 'true'
+const basePath = isPagesBuild ? `/${repoName}/` : '/'
+
 const pwaManifest: Partial<ManifestOptions> = {
   name: 'Calculatrice scientifique',
   short_name: 'CalcSci',
@@ -10,7 +14,7 @@ const pwaManifest: Partial<ManifestOptions> = {
   theme_color: '#0a1628',
   background_color: '#0a1628',
   display: 'standalone',
-  start_url: '/',
+  start_url: basePath,
   icons: [
     {
       src: '/icon.svg',
@@ -23,6 +27,7 @@ const pwaManifest: Partial<ManifestOptions> = {
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: basePath,
   plugins: [
     react(),
     VitePWA({
