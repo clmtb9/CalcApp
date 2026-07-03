@@ -99,7 +99,7 @@ export function Keypad({ shiftOn, onPress, onButtonSizeChange }: KeypadProps) {
       const base = (width - nextGap * (cols - 1)) / cols
       const baseByHeight = (height - nextGap * (rows - 1)) / rows
       const fromWidth = base * 0.95
-      const fromHeight = baseByHeight * 1.02
+      const fromHeight = baseByHeight * 1.08
       const nextSize = Math.max(34, Math.min(fromWidth, fromHeight))
       setGap(nextGap)
       setButtonSize(nextSize)
