@@ -96,7 +96,7 @@ body {
   border-radius: 14px;
   border: 0;
   background: #000;
-  flex: 1;
+  flex: 0.78;
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -363,6 +363,12 @@ body {
 
 .result-sub-switchable {
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.result-sub-switchable:active {
+  background: transparent;
 }
 
 .mode-strip {
@@ -473,7 +479,7 @@ body {
   grid-template-columns: repeat(5, minmax(0, 1fr));
   justify-items: center;
   align-items: center;
-  flex: 1;
+  flex: 1.22;
   min-height: 0;
   align-content: end;
 }

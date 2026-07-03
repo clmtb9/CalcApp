@@ -371,6 +371,9 @@ export function ScreenCard({
 
         <div
           className={hasApproximation ? 'result-sub result-sub-visible result-sub-switchable' : 'result-sub'}
+          onPointerDown={(event) => {
+            event.preventDefault()
+          }}
           onClick={() => {
             if (!hasApproximation) {
               return
