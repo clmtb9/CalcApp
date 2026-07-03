@@ -43,7 +43,7 @@ export function Calculator({
   onSaveNamedResult,
 }: CalculatorProps) {
   const [saveModalOpen, setSaveModalOpen] = useState(false)
-  const [keyButtonSize, setKeyButtonSize] = useState(56)
+  const [keyButtonSize, setKeyButtonSize] = useState(58)
   const { state, displayResult, dispatch, pressButton, pasteExpression } = useCalculator({
     disableKeyboardShortcuts: saveModalOpen,
     resumeCalculation,

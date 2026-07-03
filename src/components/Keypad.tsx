@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { calcSpec, keypadMap } from '../spec/spec'
 
 interface KeypadProps {
@@ -80,7 +80,7 @@ export function Keypad({ shiftOn, onPress, onButtonSizeChange }: KeypadProps) {
     }
   }, [])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const element = containerRef.current
     if (!element) {
       return
