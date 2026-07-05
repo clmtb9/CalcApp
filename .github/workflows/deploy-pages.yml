@@ -65,13 +65,17 @@ jobs:
             index-nFKMvW-d.js \
             index-CJey--hw.js \
             index-f8apfsFO.js; do
-            cp "$latest_js" ".gh-pages/assets/$legacy_js"
+            if [ "$(basename "$latest_js")" != "$legacy_js" ]; then
+              cp "$latest_js" ".gh-pages/assets/$legacy_js"
+            fi
           done
 
           for legacy_css in \
             index-lH60ypsK.css \
             index-AYpm_WVJ.css; do
-            cp "$latest_css" ".gh-pages/assets/$legacy_css"
+            if [ "$(basename "$latest_css")" != "$legacy_css" ]; then
+              cp "$latest_css" ".gh-pages/assets/$legacy_css"
+            fi
           done
 
           cd .gh-pages
