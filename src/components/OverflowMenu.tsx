@@ -17,7 +17,7 @@ export function OverflowMenu({
     <div className="status-menu-wrap">
       <button
         type="button"
-        className="status-menu-btn"
+        className="status-toggle-btn status-toggle-btn-switch"
         title={nextTab === 'notes' ? 'Basculer vers Notes' : 'Basculer vers Calc'}
         onClick={() => onNavigateTab(nextTab)}
       >
