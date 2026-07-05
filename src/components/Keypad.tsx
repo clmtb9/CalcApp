@@ -92,10 +92,9 @@ export function Keypad({ shiftOn, onPress, onButtonSizeChange }: KeypadProps) {
       const height = element.clientHeight
       const cols = calcSpec.layout.keypad.cols
       const rows = calcSpec.layout.keypad.rows
-      const viewportH = window.innerHeight
       const viewportW = window.innerWidth
 
-      const compactFactor = viewportH <= 620 ? 0.58 : viewportH <= 700 ? 0.68 : viewportH <= 820 ? 0.82 : viewportH <= 940 ? 0.88 : 1
+      const compactFactor = height <= 280 ? 0.58 : height <= 340 ? 0.68 : height <= 430 ? 0.82 : height <= 520 ? 0.88 : 1
       const nextRowGap = Math.max(0, Math.round(calcSpec.layout.keypad.horizontal_gap_px * compactFactor * 0.75))
       const widthFactor = viewportW <= 380 ? 0 : viewportW <= 420 ? 0.08 : viewportW <= 480 ? 0.15 : viewportW <= 700 ? 0.25 : 0.5
       const nextColumnGap = Math.max(0, Math.round(calcSpec.layout.keypad.horizontal_gap_px * compactFactor * widthFactor))
@@ -104,7 +103,9 @@ export function Keypad({ shiftOn, onPress, onButtonSizeChange }: KeypadProps) {
       const baseByHeight = (height - nextRowGap * (rows - 1)) / rows
       const fromWidth = base * 1
       const fromHeight = baseByHeight * 1.08
-      const nextSize = Math.max(34, Math.min(fromWidth, fromHeight))
+      const mobileHeightFloor = viewportW <= 700 ? fromWidth * 0.84 : 0
+      const stabilizedByHeight = Math.max(fromHeight, mobileHeightFloor)
+      const nextSize = Math.max(34, Math.min(fromWidth, stabilizedByHeight))
       setColumnGap(nextColumnGap)
       setRowGap(nextRowGap)
       setButtonSize(nextSize)
