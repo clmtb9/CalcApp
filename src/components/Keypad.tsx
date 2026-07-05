@@ -95,9 +95,9 @@ export function Keypad({ shiftOn, onPress, onButtonSizeChange }: KeypadProps) {
       const viewportH = window.innerHeight
       const viewportW = window.innerWidth
 
-      const compactFactor = viewportH <= 620 ? 0.62 : viewportH <= 700 ? 0.72 : viewportH <= 820 ? 0.86 : viewportH <= 940 ? 0.9 : 1
-      const nextRowGap = Math.max(1, Math.round(calcSpec.layout.keypad.horizontal_gap_px * compactFactor))
-      const widthFactor = viewportW <= 380 ? 0.25 : viewportW <= 420 ? 0.33 : viewportW <= 480 ? 0.45 : 0.6
+      const compactFactor = viewportH <= 620 ? 0.58 : viewportH <= 700 ? 0.68 : viewportH <= 820 ? 0.82 : viewportH <= 940 ? 0.88 : 1
+      const nextRowGap = Math.max(0, Math.round(calcSpec.layout.keypad.horizontal_gap_px * compactFactor * 0.75))
+      const widthFactor = viewportW <= 380 ? 0 : viewportW <= 420 ? 0.08 : viewportW <= 480 ? 0.15 : viewportW <= 700 ? 0.25 : 0.5
       const nextColumnGap = Math.max(0, Math.round(calcSpec.layout.keypad.horizontal_gap_px * compactFactor * widthFactor))
 
       const base = (width - nextColumnGap * (cols - 1)) / cols

@@ -96,7 +96,7 @@ body {
   border-radius: 14px;
   border: 0;
   background: #000;
-  flex: 0.52;
+  flex: 0.44;
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -479,7 +479,7 @@ body {
   grid-template-columns: repeat(5, minmax(0, 1fr));
   justify-items: center;
   align-items: center;
-  flex: 1.48;
+  flex: 1.62;
   min-height: 0;
   align-content: end;
 }
@@ -1161,8 +1161,8 @@ body {
 
 @media (max-width: 480px) {
   .calc-root {
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-left: 4px;
+    padding-right: 4px;
   }
 }
 
