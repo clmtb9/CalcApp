@@ -9,7 +9,7 @@ const DECIMAL_LABEL_LONG_PRESS_MS = 500
 const EXPRESSION_LONG_PRESS_MS = 500
 
 function normalizeResultForCopy(value: string): string {
-  return value.replace(/^=\s*/, '').replace(/^≈\s*/, '').trim()
+  return value.replace(/^(?:[=≈~∼]\s*)+/, '').trim()
 }
 
 async function copyTextToClipboard(value: string): Promise<boolean> {
