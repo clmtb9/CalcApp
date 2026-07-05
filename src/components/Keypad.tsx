@@ -99,10 +99,10 @@ export function Keypad({ shiftOn, onPress, onButtonSizeChange }: KeypadProps) {
 
       const compactFactor = height <= 280 ? 0.58 : height <= 340 ? 0.68 : height <= 430 ? 0.82 : height <= 520 ? 0.88 : 1
       const nextRowGap = isMobile
-        ? Math.max(5, Math.round(baseGap * compactFactor * 0.68))
-        : Math.max(6, Math.round(baseGap * compactFactor * 1.15))
-      const widthFactor = viewportW <= 380 ? 0.2 : viewportW <= 420 ? 0.28 : viewportW <= 480 ? 0.38 : viewportW <= 700 ? 0.5 : 0.7
-      const nextColumnGap = Math.max(isMobile ? 4 : 6, Math.round(baseGap * compactFactor * widthFactor)) + 1
+        ? Math.max(6, Math.round(baseGap * compactFactor * 0.88))
+        : Math.max(8, Math.round(baseGap * compactFactor * 1.45))
+      const widthFactor = viewportW <= 380 ? 0.3 : viewportW <= 420 ? 0.38 : viewportW <= 480 ? 0.5 : viewportW <= 700 ? 0.62 : 0.84
+      const nextColumnGap = Math.max(isMobile ? 5 : 8, Math.round(baseGap * compactFactor * widthFactor)) + 2
 
       const base = (width - nextColumnGap * (cols - 1)) / cols
       const baseByHeight = (height - nextRowGap * (rows - 1)) / rows
