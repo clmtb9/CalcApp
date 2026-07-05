@@ -78,7 +78,7 @@ export function Calculator({
         }}
       />
 
-      <Keypad shiftOn={state.shiftOn} onPress={pressButton} />
+      <Keypad shiftOn={state.shiftOn} onPress={pressButton} onOpenFormulas={() => onNavigateTab('formulas')} />
 
       <SaveResultModal
         open={saveModalOpen}

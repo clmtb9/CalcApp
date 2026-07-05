@@ -4,10 +4,11 @@ import { calcSpec, keypadMap } from '../spec/spec'
 interface KeypadProps {
   shiftOn: boolean
   onPress: (label: string) => void
+  onOpenFormulas?: () => void
   onButtonSizeChange?: (size: number) => void
 }
 
-const OPERATOR_KEYS = new Set(['divide', 'times', 'minus', 'plus', '^', '%', 'sci_E', '.', '(', ')'])
+const OPERATOR_KEYS = new Set(['divide', 'times', 'minus', 'plus', '^', '%', '.', '(', ')'])
 const FUNCTION_KEYS = new Set(['sin', 'cos', 'tan', 'log', 'ln', 'sqrt', '!'])
 const MODE_KEYS = new Set(['rad', 'deg', 'inv'])
 const SYSTEM_KEYS = new Set(['AC', 'backspace'])
@@ -35,7 +36,7 @@ function getKeyToneClass(label: string): string {
   return 'key-tone-op'
 }
 
-export function Keypad({ shiftOn, onPress, onButtonSizeChange }: KeypadProps) {
+export function Keypad({ shiftOn, onPress, onOpenFormulas, onButtonSizeChange }: KeypadProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const holdTimeoutRef = useRef<number | null>(null)
   const holdIntervalRef = useRef<number | null>(null)
@@ -161,6 +162,9 @@ export function Keypad({ shiftOn, onPress, onButtonSizeChange }: KeypadProps) {
         if (label === 'inv' && shiftOn) {
           classes.push('key-shift')
         }
+        if (label === 'sci_E') {
+          classes.push('key-tone-mode')
+        }
 
         return (
           <button
@@ -177,6 +181,10 @@ export function Keypad({ shiftOn, onPress, onButtonSizeChange }: KeypadProps) {
             onPointerCancel={stopHoldRepeat}
             onPointerLeave={stopHoldRepeat}
             onClick={() => {
+              if (label === 'sci_E') {
+                onOpenFormulas?.()
+                return
+              }
               if (suppressClickRef.current) {
                 suppressClickRef.current = false
                 return
@@ -221,7 +229,7 @@ function displayLabel(raw: string, shiftOn: boolean): string {
     plus: '+',
     backspace: '⌫',
     equals: '=',
-    sci_E: 'E',
+    sci_E: 'Formules',
     inv: 'INV',
     sqrt: '√',
     rad: '<',
