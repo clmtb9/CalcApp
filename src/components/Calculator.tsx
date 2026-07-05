@@ -43,7 +43,7 @@ export function Calculator({
   onSaveNamedResult,
 }: CalculatorProps) {
   const [saveModalOpen, setSaveModalOpen] = useState(false)
-  const [bottomSpacerPx, setBottomSpacerPx] = useState(0)
+  const [bottomSpacerPx, setBottomSpacerPx] = useState<number | null>(null)
   const { state, displayResult, dispatch, pressButton, pasteExpression } = useCalculator({
     disableKeyboardShortcuts: saveModalOpen,
     resumeCalculation,
@@ -54,9 +54,7 @@ export function Calculator({
   const suggestedLabel = `Resultat ${new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`
 
   const handleKeyButtonSizeChange = (size: number) => {
-    if (bottomSpacerPx === 0) {
-      setBottomSpacerPx(Math.round(size / 2))
-    }
+    setBottomSpacerPx(Math.round(size / 2))
   }
 
   return (
@@ -87,7 +85,7 @@ export function Calculator({
 
       <Keypad shiftOn={state.shiftOn} onPress={pressButton} onButtonSizeChange={handleKeyButtonSizeChange} />
 
-      <div style={{ height: `${bottomSpacerPx}px`, flexShrink: 0 }} />
+      {bottomSpacerPx !== null ? <div style={{ height: `${bottomSpacerPx}px`, flexShrink: 0 }} /> : null}
 
       <SaveResultModal
         open={saveModalOpen}
