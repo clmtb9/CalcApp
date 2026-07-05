@@ -40,6 +40,8 @@ export function Keypad({ shiftOn, onPress, onButtonSizeChange }: KeypadProps) {
   const holdTimeoutRef = useRef<number | null>(null)
   const holdIntervalRef = useRef<number | null>(null)
   const suppressClickRef = useRef(false)
+  const stabilizedSizeRef = useRef<number | null>(null)
+  const stabilizedWidthRef = useRef<number>(0)
   const [buttonSize, setButtonSize] = useState(58)
   const [columnGap, setColumnGap] = useState(calcSpec.layout.keypad.horizontal_gap_px)
   const [rowGap, setRowGap] = useState(calcSpec.layout.keypad.horizontal_gap_px)
@@ -105,7 +107,31 @@ export function Keypad({ shiftOn, onPress, onButtonSizeChange }: KeypadProps) {
       const fromHeight = baseByHeight * 1.08
       const mobileHeightFloor = viewportW <= 700 ? fromWidth * 0.84 : 0
       const stabilizedByHeight = Math.max(fromHeight, mobileHeightFloor)
-      const nextSize = Math.max(34, Math.min(fromWidth, stabilizedByHeight))
+      const computedSize = Math.max(34, Math.min(fromWidth, stabilizedByHeight))
+
+      let nextSize = computedSize
+      if (viewportW <= 700) {
+        if (stabilizedSizeRef.current === null) {
+          stabilizedSizeRef.current = computedSize
+          stabilizedWidthRef.current = width
+        } else {
+          const widthShift = Math.abs(width - stabilizedWidthRef.current)
+          if (widthShift > 28) {
+            stabilizedSizeRef.current = computedSize
+            stabilizedWidthRef.current = width
+          } else {
+            // Keep first good size on mobile; allow tiny downward drift only.
+            nextSize = Math.max(computedSize, stabilizedSizeRef.current - 2)
+            if (nextSize > stabilizedSizeRef.current) {
+              stabilizedSizeRef.current = nextSize
+            }
+          }
+        }
+      } else {
+        stabilizedSizeRef.current = null
+        stabilizedWidthRef.current = width
+      }
+
       setColumnGap(nextColumnGap)
       setRowGap(nextRowGap)
       setButtonSize(nextSize)
