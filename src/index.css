@@ -561,6 +561,12 @@ body {
   --key-flash-color: rgba(232, 112, 58, 0.68);
 }
 
+.key-rad {
+  --key-flash-color: rgba(255, 122, 122, 0.68);
+  color: #ff7a7a;
+  text-shadow: 0 0 8px rgba(255, 122, 122, 0.25);
+}
+
 .key-equals.key-tone-op {
   color: #fff;
   text-shadow: none;

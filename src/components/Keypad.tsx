@@ -189,6 +189,9 @@ export function Keypad({ shiftOn, onPress, onOpenFormulas, onButtonSizeChange }:
         if (label === 'sci_E') {
           classes.push('key-tone-mode')
         }
+        if (label === 'rad') {
+          classes.push('key-rad')
+        }
 
         return (
           <button
