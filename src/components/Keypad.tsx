@@ -13,6 +13,7 @@ const FUNCTION_KEYS = new Set(['sin', 'cos', 'tan', 'log', 'ln', 'sqrt', '!'])
 const MODE_KEYS = new Set(['rad', 'deg', 'inv'])
 const SYSTEM_KEYS = new Set(['AC', 'backspace'])
 const CONSTANT_KEYS = new Set(['pi', 'e'])
+const DARKER_KEYS = new Set(['AC', '%', 'backspace', 'divide', 'times', 'plus', 'minus'])
 
 function getKeyToneClass(label: string): string {
   if (/^\d$/.test(label)) {
@@ -172,6 +173,9 @@ export function Keypad({ shiftOn, onPress, onOpenFormulas, onButtonSizeChange }:
         const toneClass = getKeyToneClass(label)
         if (toneClass) {
           classes.push(toneClass)
+        }
+        if (DARKER_KEYS.has(label)) {
+          classes.push('key-btn-darker')
         }
         if (flashKeyId === keyId) {
           classes.push('key-btn-flash')
