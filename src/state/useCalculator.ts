@@ -37,6 +37,15 @@ function clampPrecision(value: number): number {
   return Math.max(0, Math.min(12, value))
 }
 
+function isFormattedValueExact(value: number, formatted: string): boolean {
+  const parsed = Number(formatted)
+  if (!Number.isFinite(parsed)) {
+    return false
+  }
+  const tolerance = Math.max(1e-12, Math.abs(value) * 1e-12)
+  return Math.abs(parsed - value) <= tolerance
+}
+
 function applyDisplayFormatting(args: {
   resultMain: string
   resultSub: string
@@ -65,7 +74,8 @@ function applyDisplayFormatting(args: {
 
   if (resultSub.trim()) {
     const subPrefixMatch = resultSub.trim().match(/^([=~≈])/)
-    const subPrefix = subPrefixMatch?.[1] === '=' ? '=' : '~'
+    const shouldKeepExactPrefix = subPrefixMatch?.[1] === '=' && isFormattedValueExact(resultNumeric, formatted)
+    const subPrefix = shouldKeepExactPrefix ? '=' : '~'
     return {
       resultMain,
       resultSub: `${subPrefix} ${formatted}`,
