@@ -51,22 +51,22 @@ body {
 
 .app-build-badge {
   position: fixed;
-  top: max(6px, env(safe-area-inset-top));
-  right: 8px;
+  top: max(4px, env(safe-area-inset-top));
+  right: 6px;
   z-index: 30;
-  height: 20px;
-  padding: 0 8px;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent 30%);
-  background: color-mix(in srgb, #0b1220 88%, #1d3555 12%);
-  color: color-mix(in srgb, var(--expr-par) 70%, white 30%);
+  height: 14px;
+  padding: 0 4px;
+  border-radius: 6px;
+  border: 0;
+  background: transparent;
+  color: color-mix(in srgb, #9aa3ad 72%, transparent 28%);
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  line-height: 18px;
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  line-height: 14px;
   pointer-events: none;
-  opacity: 0.92;
+  opacity: 0.3;
 }
 
 .calc-root {
@@ -997,8 +997,20 @@ body {
   min-width: 72px;
 }
 
+.note-title-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
 .note-options-wrap {
   position: relative;
+}
+
+.note-toolbar-menu-wrap {
+  justify-self: end;
 }
 
 .note-options-btn {
@@ -1312,11 +1324,11 @@ body {
     grid-area: back;
   }
 
-  .notes-preview-toolbar .note-title-input {
+  .notes-preview-toolbar .note-title-row {
     grid-area: title;
   }
 
-  .notes-preview-toolbar .note-options-wrap {
+  .notes-preview-toolbar .note-toolbar-menu-wrap {
     grid-area: options;
   }
 }

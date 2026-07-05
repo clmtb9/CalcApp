@@ -11,6 +11,7 @@ import type { RecentCalculation } from './history'
 const HISTORY_KEY = 'scientific-calculator-history'
 const ACTIVE_STATE_KEY = 'scientific-calculator-active-state'
 const DEFAULT_DECIMAL_PRECISION = 3
+const AUTO_HISTORY_IDLE_MS = 1500
 
 function normalizePastedExpression(value: string): string {
   return value
@@ -573,32 +574,36 @@ export function useCalculator(options: UseCalculatorOptions = {}) {
     ? persistedResult
     : livePreview
 
-  useEffect(() => {
-    if (!state.isResult || !state.expr.trim()) {
-      return
-    }
-
-    const signature = `${state.expr}|${displayResult.resultMain}|${displayResult.resultSub}|${state.angleMode}|${state.exactMode}|${state.resultFormat}|${state.resultPrecision}|${displayResult.isError}`
+  const persistRecentCalculation = (result: typeof displayResult, signature: string) => {
     if (lastPersistedResultSignatureRef.current === signature) {
       return
     }
 
     const nextEntry = {
       expression: state.expr,
-      resultMain: displayResult.resultMain,
-      resultSub: displayResult.resultSub,
-      resultNumeric: displayResult.resultNumeric,
+      resultMain: result.resultMain,
+      resultSub: result.resultSub,
+      resultNumeric: result.resultNumeric,
       resultFormat: state.resultFormat,
       resultPrecision: state.resultPrecision,
       angleMode: state.angleMode,
       exactMode: state.exactMode,
-      isError: displayResult.isError,
+      isError: result.isError,
       createdAt: new Date().toISOString(),
     }
 
     const existing = readRecentCalculations()
     writeRecentCalculations([nextEntry, ...existing])
     lastPersistedResultSignatureRef.current = signature
+  }
+
+  useEffect(() => {
+    if (!state.isResult || !state.expr.trim()) {
+      return
+    }
+
+    const signature = `${state.expr}|${displayResult.resultMain}|${displayResult.resultSub}|${state.angleMode}|${state.exactMode}|${state.resultFormat}|${state.resultPrecision}|${displayResult.isError}`
+    persistRecentCalculation(displayResult, signature)
   }, [
     state.isResult,
     state.expr,
@@ -610,6 +615,34 @@ export function useCalculator(options: UseCalculatorOptions = {}) {
     displayResult.resultSub,
     displayResult.resultNumeric,
     displayResult.isError,
+  ])
+
+  useEffect(() => {
+    if (state.isResult || !state.expr.trim()) {
+      return
+    }
+
+    if (!livePreview.resultMain.trim() && !livePreview.isError) {
+      return
+    }
+
+    const timeout = window.setTimeout(() => {
+      const signature = `${state.expr}|${livePreview.resultMain}|${livePreview.resultSub}|${state.angleMode}|${state.exactMode}|${state.resultFormat}|${state.resultPrecision}|${livePreview.isError}`
+      persistRecentCalculation(livePreview, signature)
+    }, AUTO_HISTORY_IDLE_MS)
+
+    return () => window.clearTimeout(timeout)
+  }, [
+    state.isResult,
+    state.expr,
+    state.angleMode,
+    state.exactMode,
+    state.resultFormat,
+    state.resultPrecision,
+    livePreview.resultMain,
+    livePreview.resultSub,
+    livePreview.resultNumeric,
+    livePreview.isError,
   ])
 
   const api = useMemo(

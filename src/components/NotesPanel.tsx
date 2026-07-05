@@ -448,14 +448,64 @@ export function NotesPanel({
                 Retour
               </button>
 
-              <input
-                className="note-title-input"
-                value={active.title}
-                onChange={(event) => onUpdateNote(active.id, { title: event.target.value })}
-                placeholder="Titre de la note"
-              />
+              <div className="note-title-row">
+                <input
+                  className="note-title-input"
+                  value={active.title}
+                  onChange={(event) => onUpdateNote(active.id, { title: event.target.value })}
+                  placeholder="Titre de la note"
+                />
 
-              <div className="note-options-wrap" ref={optionsMenuRef}>
+                <div className="note-options-wrap" ref={optionsMenuRef}>
+                  <button
+                    type="button"
+                    className="status-menu-btn note-options-btn"
+                    aria-haspopup="menu"
+                    aria-expanded={showOptionsMenu}
+                    aria-label="Options"
+                    onClick={() => setShowOptionsMenu((value) => !value)}
+                  >
+                    ...
+                  </button>
+                  {showOptionsMenu ? (
+                    <div className="status-menu-panel status-menu-panel-open note-options-menu" role="menu" aria-label="Options note">
+                      <button
+                        type="button"
+                        className="status-menu-item note-options-item"
+                        role="menuitem"
+                        onClick={async () => {
+                          setShowOptionsMenu(false)
+                          await handleExportActiveNotePdf()
+                        }}
+                      >
+                        Exporter la note en PDF
+                      </button>
+                      <button
+                        type="button"
+                        className="status-menu-item note-options-item note-options-item-danger"
+                        role="menuitem"
+                        onClick={() => {
+                          if (notes.length === 1) {
+                            return
+                          }
+                          const ok = window.confirm('Supprimer cette note ? Cette action est irreversible.')
+                          if (ok) {
+                            onDeleteNote(active.id)
+                            setShowOptionsMenu(false)
+                            setNotesScreen('list')
+                          }
+                        }}
+                        disabled={notes.length === 1}
+                        title={notes.length === 1 ? 'Impossible de supprimer la derniere note.' : 'Supprimer cette note'}
+                      >
+                        Supprimer la note
+                      </button>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+
+              <div className="note-toolbar-menu-wrap">
                 <OverflowMenu
                   activeTab={activeTab}
                   isOffline={isOffline}
@@ -464,51 +514,6 @@ export function NotesPanel({
                   onNavigateTab={handleNavigate}
                   onRefreshApp={onRefreshApp}
                 />
-                <button
-                  type="button"
-                  className="status-menu-btn note-options-btn"
-                  aria-haspopup="menu"
-                  aria-expanded={showOptionsMenu}
-                  aria-label="Options"
-                  onClick={() => setShowOptionsMenu((value) => !value)}
-                >
-                  ...
-                </button>
-                {showOptionsMenu ? (
-                  <div className="status-menu-panel status-menu-panel-open note-options-menu" role="menu" aria-label="Options note">
-                    <button
-                      type="button"
-                      className="status-menu-item note-options-item"
-                      role="menuitem"
-                      onClick={async () => {
-                        setShowOptionsMenu(false)
-                        await handleExportActiveNotePdf()
-                      }}
-                    >
-                      Exporter la note en PDF
-                    </button>
-                    <button
-                      type="button"
-                      className="status-menu-item note-options-item note-options-item-danger"
-                      role="menuitem"
-                      onClick={() => {
-                        if (notes.length === 1) {
-                          return
-                        }
-                        const ok = window.confirm('Supprimer cette note ? Cette action est irreversible.')
-                        if (ok) {
-                          onDeleteNote(active.id)
-                          setShowOptionsMenu(false)
-                          setNotesScreen('list')
-                        }
-                      }}
-                      disabled={notes.length === 1}
-                      title={notes.length === 1 ? 'Impossible de supprimer la derniere note.' : 'Supprimer cette note'}
-                    >
-                      Supprimer la note
-                    </button>
-                  </div>
-                ) : null}
               </div>
             </div>
 
