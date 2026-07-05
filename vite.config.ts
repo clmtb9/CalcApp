@@ -31,18 +31,6 @@ const pwaManifest: Partial<ManifestOptions> = {
       type: 'image/png',
       purpose: 'any maskable',
     },
-    {
-      src: 'icon.svg',
-      sizes: 'any',
-      type: 'image/svg+xml',
-      purpose: 'any',
-    },
-    {
-      src: 'icon.svg',
-      sizes: 'any',
-      type: 'image/svg+xml',
-      purpose: 'maskable',
-    },
   ],
 }
 
@@ -56,7 +44,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icon.svg', 'favicon.svg'],
+      includeAssets: ['icon-192.png', 'icon-512.png', 'favicon.png'],
       manifest: pwaManifest,
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
