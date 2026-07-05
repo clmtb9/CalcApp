@@ -71,7 +71,10 @@ jobs:
           for legacy_css in \
             index-lH60ypsK.css \
             index-AYpm_WVJ.css; do
-            cp "$latest_css" ".gh-pages/assets/$legacy_css"
+            target_css=".gh-pages/assets/$legacy_css"
+            if [ "$latest_css" != "$target_css" ]; then
+              cp "$latest_css" "$target_css"
+            fi
           done
 
           cd .gh-pages
