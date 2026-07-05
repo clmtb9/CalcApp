@@ -129,6 +129,17 @@ export function runEngine(input: EngineInput): EngineOutput {
 
   const fractionRepresentation = toFraction(value)
   if (fractionRepresentation) {
+    if (/^-?\d+\/1$/.test(fractionRepresentation)) {
+      const integerValue = fractionRepresentation.slice(0, fractionRepresentation.indexOf('/'))
+      return {
+        resultMain: `= ${integerValue}`,
+        resultSub: '',
+        isError: false,
+        numericResult: value,
+        normalizedExpr,
+      }
+    }
+
     return {
       resultMain: `= ${fractionRepresentation}`,
       resultSub: `~ ${decimal}`,
