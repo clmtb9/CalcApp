@@ -8,6 +8,21 @@ import type { RecentCalculation } from './state/history'
 const VOLATILE_STORAGE_KEYS = ['scientific-calculator-history']
 const BUILD_LABEL = `v${__BUILD_ID__}`
 
+type WakeLockSentinelLike = {
+  released: boolean
+  release: () => Promise<void>
+}
+
+type NavigatorWithWakeLock = Navigator & {
+  wakeLock?: {
+    request: (type: 'screen') => Promise<WakeLockSentinelLike>
+  }
+}
+
+type ScreenOrientationWithLock = ScreenOrientation & {
+  lock?: (orientation: 'portrait' | 'portrait-primary') => Promise<void>
+}
+
 function App() {
   const [activeTab, setActiveTab] = useState<'calculator' | 'notes' | 'formulas'>('calculator')
   const [isOffline, setIsOffline] = useState(() => !navigator.onLine)
@@ -69,6 +84,55 @@ function App() {
     return () => {
       window.removeEventListener('online', handleOnline)
       window.removeEventListener('offline', handleOffline)
+    }
+  }, [])
+
+  useEffect(() => {
+    let wakeLock: WakeLockSentinelLike | null = null
+    let disposed = false
+
+    const requestWakeLock = async () => {
+      const navigatorWithWakeLock = navigator as NavigatorWithWakeLock
+      if (!navigatorWithWakeLock.wakeLock?.request || document.visibilityState !== 'visible') {
+        return
+      }
+
+      try {
+        wakeLock = await navigatorWithWakeLock.wakeLock.request('screen')
+      } catch {
+        wakeLock = null
+      }
+    }
+
+    const lockOrientation = async () => {
+      const orientation = screen.orientation as ScreenOrientationWithLock | undefined
+      if (!orientation?.lock) {
+        return
+      }
+
+      try {
+        await orientation.lock('portrait')
+      } catch {
+        // Ignore unsupported or user-gesture restricted orientation locks.
+      }
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && !disposed) {
+        void requestWakeLock()
+      }
+    }
+
+    void requestWakeLock()
+    void lockOrientation()
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    return () => {
+      disposed = true
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      if (wakeLock && !wakeLock.released) {
+        void wakeLock.release()
+      }
     }
   }, [])
 
