@@ -5,6 +5,7 @@ interface KeypadProps {
   shiftOn: boolean
   onPress: (label: string) => void
   onOpenFormulas?: () => void
+  onOpenSettings?: () => void
   onButtonSizeChange?: (size: number) => void
 }
 
@@ -37,7 +38,7 @@ function getKeyToneClass(label: string): string {
   return 'key-tone-op'
 }
 
-export function Keypad({ shiftOn, onPress, onOpenFormulas, onButtonSizeChange }: KeypadProps) {
+export function Keypad({ shiftOn, onPress, onOpenFormulas, onOpenSettings, onButtonSizeChange }: KeypadProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const holdTimeoutRef = useRef<number | null>(null)
   const holdIntervalRef = useRef<number | null>(null)
@@ -209,7 +210,11 @@ export function Keypad({ shiftOn, onPress, onOpenFormulas, onButtonSizeChange }:
             onPointerLeave={stopHoldRepeat}
             onClick={() => {
               if (label === 'sci_E') {
-                onOpenFormulas?.()
+                if (shiftOn) {
+                  onOpenSettings?.()
+                } else {
+                  onOpenFormulas?.()
+                }
                 return
               }
               if (suppressClickRef.current) {
@@ -280,6 +285,9 @@ function displayLabel(raw: string, shiftOn: boolean): string {
   }
   if (shiftOn && raw === 'sqrt') {
     return 'x²'
+  }
+  if (shiftOn && raw === 'sci_E') {
+    return 'param.'
   }
 
   return labels[raw] ?? raw

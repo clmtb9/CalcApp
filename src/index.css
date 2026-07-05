@@ -754,7 +754,24 @@ body {
   padding: 18px 16px 10px;
 }
 
+.settings-root {
+  width: min(100%, 460px);
+  margin: 0 auto;
+  height: calc(100svh - 56px);
+  padding: 18px 16px 10px;
+}
+
 .formulas-card {
+  height: 100%;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--screen) 92%, #1f344f 8%);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.settings-card {
   height: 100%;
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -781,12 +798,45 @@ body {
   gap: 8px;
 }
 
+.settings-title-row {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.settings-title-block {
+  min-width: 0;
+}
+
+.settings-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--expr-par);
+}
+
+.settings-subtitle {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
 .formulas-title-row .formulas-title {
   padding: 0;
   border-bottom: 0;
 }
 
 .formulas-list {
+  min-height: 0;
+  overflow: auto;
+  padding: 10px;
+  display: grid;
+  gap: 8px;
+}
+
+.settings-list {
   min-height: 0;
   overflow: auto;
   padding: 10px;
@@ -801,6 +851,32 @@ body {
   padding: 8px;
   display: grid;
   gap: 4px;
+}
+
+.settings-item {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--screen) 95%, #1d3555 5%);
+  padding: 10px;
+  display: grid;
+  gap: 4px;
+}
+
+.settings-item-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--expr-num);
+}
+
+.settings-item-text {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.settings-actions {
+  grid-template-columns: 1fr;
+  gap: 8px;
 }
 
 .formula-item-head {

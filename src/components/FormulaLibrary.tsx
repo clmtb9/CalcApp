@@ -51,16 +51,16 @@ const FORMULAS: FormulaItem[] = [
 
 interface FormulaLibraryProps {
   onUseFormula: (payload: { expression: string; angleMode?: 'deg' | 'rad' }) => void
-  activeTab: 'calculator' | 'notes' | 'formulas'
+  activeTab: 'calculator' | 'notes' | 'formulas' | 'settings'
   isOffline: boolean
-  onNavigateTab: (tab: 'calculator' | 'notes' | 'formulas') => void
+  onNavigateTab: (tab: 'calculator' | 'notes' | 'formulas' | 'settings') => void
   onRefreshApp: () => void
 }
 
 export function FormulaLibrary({ onUseFormula, activeTab, isOffline, onNavigateTab, onRefreshApp }: FormulaLibraryProps) {
   const [menuOpen, setMenuOpen] = useState(false)
 
-  const handleNavigate = (tab: 'calculator' | 'notes' | 'formulas') => {
+  const handleNavigate = (tab: 'calculator' | 'notes' | 'formulas' | 'settings') => {
     setMenuOpen(false)
     onNavigateTab(tab)
   }

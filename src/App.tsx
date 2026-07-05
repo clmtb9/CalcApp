@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Calculator } from './components/Calculator'
 import { FormulaLibrary } from './components/FormulaLibrary'
 import { NotesPanel } from './components/NotesPanel'
+import { SettingsPage } from './components/SettingsPage'
 import { useNotes } from './notes/useNotes'
 import type { RecentCalculation } from './state/history'
 
@@ -24,7 +25,7 @@ type ScreenOrientationWithLock = ScreenOrientation & {
 }
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'calculator' | 'notes' | 'formulas'>('calculator')
+  const [activeTab, setActiveTab] = useState<'calculator' | 'notes' | 'formulas' | 'settings'>('calculator')
   const [isOffline, setIsOffline] = useState(() => !navigator.onLine)
   const [resumeCalculation, setResumeCalculation] = useState<RecentCalculation | null>(null)
   const [resumeFromNote, setResumeFromNote] = useState<{ expression: string; angleMode?: 'deg' | 'rad' } | null>(null)
@@ -197,7 +198,7 @@ function App() {
             setActiveTab('calculator')
           }}
         />
-      ) : (
+      ) : activeTab === 'formulas' ? (
         <FormulaLibrary
           activeTab={activeTab}
           isOffline={isOffline}
@@ -207,6 +208,14 @@ function App() {
             setResumeFromNote({ expression: payload.expression, angleMode: payload.angleMode })
             setActiveTab('calculator')
           }}
+        />
+      ) : (
+        <SettingsPage
+          activeTab={activeTab}
+          isOffline={isOffline}
+          onNavigateTab={setActiveTab}
+          onRefreshApp={handleMaj}
+          buildLabel={BUILD_LABEL}
         />
       )}
     </div>

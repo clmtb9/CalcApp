@@ -12,9 +12,9 @@ interface CalculatorProps {
   targetNoteId: string
   resumeCalculation: RecentCalculation | null
   resumeFromNote: { expression: string; angleMode?: 'deg' | 'rad' } | null
-  activeTab: 'calculator' | 'notes' | 'formulas'
+  activeTab: 'calculator' | 'notes' | 'formulas' | 'settings'
   isOffline: boolean
-  onNavigateTab: (tab: 'calculator' | 'notes' | 'formulas') => void
+  onNavigateTab: (tab: 'calculator' | 'notes' | 'formulas' | 'settings') => void
   onRefreshApp: () => void
   onSaveNamedResult: (payload: {
     noteId?: string
@@ -78,7 +78,17 @@ export function Calculator({
         }}
       />
 
-      <Keypad shiftOn={state.shiftOn} onPress={pressButton} onOpenFormulas={() => onNavigateTab('formulas')} />
+      <Keypad
+        shiftOn={state.shiftOn}
+        onPress={pressButton}
+        onOpenFormulas={() => onNavigateTab('formulas')}
+        onOpenSettings={() => {
+          if (state.shiftOn) {
+            dispatch({ type: 'TOGGLE_SHIFT' })
+          }
+          onNavigateTab('settings')
+        }}
+      />
 
       <SaveResultModal
         open={saveModalOpen}

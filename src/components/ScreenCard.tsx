@@ -45,9 +45,9 @@ interface ScreenCardProps {
     resultSub: string
     isError: boolean
   }
-  activeTab: 'calculator' | 'notes' | 'formulas'
+  activeTab: 'calculator' | 'notes' | 'formulas' | 'settings'
   isOffline: boolean
-  onNavigateTab: (tab: 'calculator' | 'notes' | 'formulas') => void
+  onNavigateTab: (tab: 'calculator' | 'notes' | 'formulas' | 'settings') => void
   onRefreshApp: () => void
   onSetAngleMode: (mode: 'deg' | 'rad') => void
   onSetResultFormat: (format: 'decimal' | 'scientific') => void
@@ -271,7 +271,7 @@ export function ScreenCard({
     }, 800)
   }
 
-  const handleNavigate = (tab: 'calculator' | 'notes' | 'formulas') => {
+  const handleNavigate = (tab: 'calculator' | 'notes' | 'formulas' | 'settings') => {
     setMenuOpen(false)
     onNavigateTab(tab)
   }

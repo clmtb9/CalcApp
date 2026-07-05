@@ -1,9 +1,9 @@
 interface OverflowMenuProps {
-  activeTab: 'calculator' | 'notes' | 'formulas'
+  activeTab: 'calculator' | 'notes' | 'formulas' | 'settings'
   isOffline?: boolean
   open?: boolean
   onToggle?: () => void
-  onNavigateTab: (tab: 'calculator' | 'notes' | 'formulas') => void
+  onNavigateTab: (tab: 'calculator' | 'notes' | 'formulas' | 'settings') => void
   onRefreshApp?: () => void
 }
 

@@ -220,9 +220,9 @@ function formatEditorHtml(content: string, searchTerm: string): string {
 interface NotesPanelProps {
   notes: NoteItem[]
   activeNoteId: string
-  activeTab: 'calculator' | 'notes' | 'formulas'
+  activeTab: 'calculator' | 'notes' | 'formulas' | 'settings'
   isOffline: boolean
-  onNavigateTab: (tab: 'calculator' | 'notes' | 'formulas') => void
+  onNavigateTab: (tab: 'calculator' | 'notes' | 'formulas' | 'settings') => void
   onRefreshApp: () => void
   onSetActiveNote: (id: string) => void
   onCreateNote: () => void
@@ -273,7 +273,7 @@ export function NotesPanel({
 
   const active = notes.find((note) => note.id === activeNoteId) ?? notes[0]
 
-  const handleNavigate = (tab: 'calculator' | 'notes' | 'formulas') => {
+  const handleNavigate = (tab: 'calculator' | 'notes' | 'formulas' | 'settings') => {
     setMenuOpen(false)
     onNavigateTab(tab)
   }
