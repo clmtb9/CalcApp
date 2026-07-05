@@ -85,10 +85,12 @@ export function ScreenCard({
   const resultCopyTimeoutRef = useRef<number | null>(null)
   const pasteFeedbackTimeoutRef = useRef<number | null>(null)
   const resultLongPressTimerRef = useRef<number | null>(null)
+  const approxLongPressTimerRef = useRef<number | null>(null)
   const decimalLongPressTimerRef = useRef<number | null>(null)
   const expressionLongPressTimerRef = useRef<number | null>(null)
   const skipNextFormatClickRef = useRef(false)
   const skipNextResultClickRef = useRef(false)
+  const skipNextApproxClickRef = useRef(false)
   const skipNextExpressionTapRef = useRef(false)
 
   const handleTapPosition = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -151,6 +153,13 @@ export function ScreenCard({
     if (resultLongPressTimerRef.current !== null) {
       window.clearTimeout(resultLongPressTimerRef.current)
       resultLongPressTimerRef.current = null
+    }
+  }
+
+  const clearApproxLongPress = () => {
+    if (approxLongPressTimerRef.current !== null) {
+      window.clearTimeout(approxLongPressTimerRef.current)
+      approxLongPressTimerRef.current = null
     }
   }
 
@@ -219,6 +228,27 @@ export function ScreenCard({
       return
     }
     onSetResultFormat(nextResultFormat)
+  }
+
+  const handleResultLongPressStart = (value: string, onCopied: () => void, skipNextClickRef: React.MutableRefObject<boolean>) => {
+    if (!value) {
+      return
+    }
+
+    skipNextClickRef.current = false
+    clearResultLongPress()
+    clearApproxLongPress()
+
+    const timerRef = skipNextClickRef === skipNextApproxClickRef ? approxLongPressTimerRef : resultLongPressTimerRef
+    timerRef.current = window.setTimeout(async () => {
+      const ok = await copyTextToClipboard(value)
+      if (ok) {
+        triggerCopyFeedback()
+        skipNextClickRef.current = true
+        onCopied()
+      }
+      timerRef.current = null
+    }, RESULT_LONG_PRESS_MS)
   }
 
   const triggerCopyFeedback = () => {
@@ -342,16 +372,7 @@ export function ScreenCard({
             if (!copyableResult) {
               return
             }
-            skipNextResultClickRef.current = false
-            clearResultLongPress()
-            resultLongPressTimerRef.current = window.setTimeout(async () => {
-              const ok = await copyTextToClipboard(copyableResult)
-              if (ok) {
-                triggerCopyFeedback()
-                skipNextResultClickRef.current = true
-              }
-              resultLongPressTimerRef.current = null
-            }, RESULT_LONG_PRESS_MS)
+            handleResultLongPressStart(copyableResult, () => undefined, skipNextResultClickRef)
           }}
           onPointerUp={clearResultLongPress}
           onPointerLeave={clearResultLongPress}
@@ -373,14 +394,25 @@ export function ScreenCard({
           className={hasApproximation ? 'result-sub result-sub-visible result-sub-switchable' : 'result-sub'}
           onPointerDown={(event) => {
             event.preventDefault()
+            if (!hasApproximation) {
+              return
+            }
+            handleResultLongPressStart(normalizeResultForCopy(displayResult.resultSub), () => undefined, skipNextApproxClickRef)
           }}
+          onPointerUp={clearApproxLongPress}
+          onPointerLeave={clearApproxLongPress}
+          onPointerCancel={clearApproxLongPress}
           onClick={() => {
+            if (skipNextApproxClickRef.current) {
+              skipNextApproxClickRef.current = false
+              return
+            }
             if (!hasApproximation) {
               return
             }
             onSetResultFormat(nextResultFormat)
           }}
-          title={hasApproximation ? `Basculer vers ${nextResultFormat === 'scientific' ? 'SCI AUTO' : 'DECIMAL'}` : undefined}
+          title={hasApproximation ? 'Appui long pour copier l approx' : undefined}
         >
           {hasApproximation ? displayResult.resultSub : ' '}
         </div>

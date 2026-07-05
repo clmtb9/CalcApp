@@ -112,7 +112,7 @@ body {
 }
 
 .screen-card {
-  margin-bottom: 10px;
+  margin-bottom: 4px;
   padding: 14px;
   border-radius: 14px;
   border: 0;
@@ -1151,7 +1151,7 @@ body {
   }
 
   .screen-card {
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     padding: 10px;
   }
 
@@ -1230,7 +1230,7 @@ body {
   }
 
   .screen-card {
-    margin-bottom: 6px;
+    margin-bottom: 3px;
     padding: 8px;
   }
 

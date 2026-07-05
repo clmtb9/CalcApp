@@ -4,5 +4,12 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"chat.tools.terminal.autoApprove": {
+			"/^graphify query \"android notification/status bar background color theme-color in this PWA\"$/": {
+				"approve": true,
+				"matchCommandLine": true
+			}
+		}
+	}
 }
