@@ -64,9 +64,11 @@ function applyDisplayFormatting(args: {
   }
 
   if (resultSub.trim()) {
+    const subPrefixMatch = resultSub.trim().match(/^([=~≈])/)
+    const subPrefix = subPrefixMatch?.[1] === '=' ? '=' : '~'
     return {
       resultMain,
-      resultSub: `~ ${formatted}`,
+      resultSub: `${subPrefix} ${formatted}`,
       isError,
       resultNumeric,
     }
