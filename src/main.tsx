@@ -4,7 +4,7 @@ import './index.css'
 import App from './App.tsx'
 import { registerServiceWorker } from './pwa/registerSW'
 
-const APP_THEME_COLOR = '#0C385C'
+const APP_THEME_COLOR = '#000000'
 
 function applyThemeColor(color: string) {
   const head = document.head

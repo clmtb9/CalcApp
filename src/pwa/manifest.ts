@@ -2,8 +2,8 @@ export const pwaManifest = {
   name: 'Calculatrice scientifique',
   short_name: 'CalcSci',
   description: 'Clone PWA de la calculatrice scientifique specifiee par YAML.',
-  theme_color: '#0C385C',
-  background_color: '#0C385C',
+  theme_color: '#000000',
+  background_color: '#000000',
   display: 'standalone',
   start_url: '/',
   icons: [
