@@ -6,6 +6,7 @@ import { useNotes } from './notes/useNotes'
 import type { RecentCalculation } from './state/history'
 
 const VOLATILE_STORAGE_KEYS = ['scientific-calculator-history']
+const BUILD_LABEL = `v${__BUILD_ID__}`
 
 function App() {
   const [activeTab, setActiveTab] = useState<'calculator' | 'notes' | 'formulas'>('calculator')
@@ -73,6 +74,9 @@ function App() {
 
   return (
     <div className="app-shell">
+      <div className="app-build-badge" aria-label={`Version ${BUILD_LABEL}`}>
+        {BUILD_LABEL}
+      </div>
       {activeTab === 'calculator' ? (
         <Calculator
           notes={notes}

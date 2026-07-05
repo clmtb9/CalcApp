@@ -46,6 +46,27 @@ body {
 
 .app-shell {
   min-height: 100svh;
+  position: relative;
+}
+
+.app-build-badge {
+  position: fixed;
+  top: max(6px, env(safe-area-inset-top));
+  right: 8px;
+  z-index: 30;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent 30%);
+  background: color-mix(in srgb, #0b1220 88%, #1d3555 12%);
+  color: color-mix(in srgb, var(--expr-par) 70%, white 30%);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  line-height: 18px;
+  pointer-events: none;
+  opacity: 0.92;
 }
 
 .calc-root {

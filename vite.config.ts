@@ -6,6 +6,7 @@ import type { ManifestOptions } from 'vite-plugin-pwa'
 const repoName = process.env.GITHUB_REPOSITORY?.split('/')[1] ?? 'CalcApp'
 const isPagesBuild = process.env.GITHUB_ACTIONS === 'true'
 const basePath = isPagesBuild ? `/${repoName}/` : '/'
+const buildId = process.env.GITHUB_SHA?.slice(0, 7) ?? 'local-dev'
 
 const pwaManifest: Partial<ManifestOptions> = {
   id: basePath,
@@ -36,6 +37,9 @@ const pwaManifest: Partial<ManifestOptions> = {
 // https://vite.dev/config/
 export default defineConfig({
   base: basePath,
+  define: {
+    __BUILD_ID__: JSON.stringify(buildId),
+  },
   plugins: [
     react(),
     VitePWA({
