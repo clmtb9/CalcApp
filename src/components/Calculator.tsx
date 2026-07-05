@@ -43,7 +43,6 @@ export function Calculator({
   onSaveNamedResult,
 }: CalculatorProps) {
   const [saveModalOpen, setSaveModalOpen] = useState(false)
-  const [bottomSpacerPx, setBottomSpacerPx] = useState<number | null>(null)
   const { state, displayResult, dispatch, pressButton, pasteExpression } = useCalculator({
     disableKeyboardShortcuts: saveModalOpen,
     resumeCalculation,
@@ -52,10 +51,6 @@ export function Calculator({
 
   const canSaveResult = Boolean(targetNoteId && state.expr.trim().length > 0 && displayResult.resultMain.trim().length > 0)
   const suggestedLabel = `Resultat ${new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`
-
-  const handleKeyButtonSizeChange = (size: number) => {
-    setBottomSpacerPx(Math.round(size / 2))
-  }
 
   return (
     <div className="calc-root" tabIndex={0}>
@@ -83,9 +78,7 @@ export function Calculator({
         }}
       />
 
-      <Keypad shiftOn={state.shiftOn} onPress={pressButton} onButtonSizeChange={handleKeyButtonSizeChange} />
-
-      {bottomSpacerPx !== null ? <div style={{ height: `${bottomSpacerPx}px`, flexShrink: 0 }} /> : null}
+      <Keypad shiftOn={state.shiftOn} onPress={pressButton} />
 
       <SaveResultModal
         open={saveModalOpen}
