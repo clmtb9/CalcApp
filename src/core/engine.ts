@@ -140,9 +140,10 @@ export function runEngine(input: EngineInput): EngineOutput {
       }
     }
 
+    const approxPrefix = hasTerminatingDecimal(fractionRepresentation) ? '=' : '~'
     return {
       resultMain: `= ${fractionRepresentation}`,
-      resultSub: `~ ${decimal}`,
+      resultSub: `${approxPrefix} ${decimal}`,
       isError: false,
       numericResult: value,
       normalizedExpr,
@@ -313,4 +314,26 @@ function gcd(a: number, b: number): number {
     x = t
   }
   return x || 1
+}
+
+function hasTerminatingDecimal(fraction: string): boolean {
+  const slashIndex = fraction.indexOf('/')
+  if (slashIndex === -1) {
+    return false
+  }
+
+  const denominatorRaw = fraction.slice(slashIndex + 1)
+  let denominator = Number.parseInt(denominatorRaw, 10)
+  if (!Number.isFinite(denominator) || denominator <= 0) {
+    return false
+  }
+
+  while (denominator % 2 === 0) {
+    denominator /= 2
+  }
+  while (denominator % 5 === 0) {
+    denominator /= 5
+  }
+
+  return denominator === 1
 }

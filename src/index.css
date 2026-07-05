@@ -317,13 +317,9 @@ body {
   height: 32px;
   min-height: 32px;
   max-height: 32px;
-  line-height: 1.2;
-  white-space: normal;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  line-height: 32px;
+  white-space: nowrap;
+  overflow: hidden;
   text-overflow: ellipsis;
 }
 
@@ -335,8 +331,10 @@ body {
 }
 
 .result-main.result-main-has-approx.result-main-scientific {
+  height: 24px;
   min-height: 24px;
-  line-height: 1.15;
+  max-height: 24px;
+  line-height: 24px;
 }
 
 .result-main-copy-ready {
