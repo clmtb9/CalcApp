@@ -93,12 +93,12 @@ export function Keypad({ shiftOn, onPress, onButtonSizeChange }: KeypadProps) {
       const rows = calcSpec.layout.keypad.rows
       const viewportH = window.innerHeight
 
-      const compactFactor = viewportH <= 620 ? 0.62 : viewportH <= 700 ? 0.72 : viewportH <= 820 ? 0.86 : 1
-      const nextGap = Math.max(2, Math.round(calcSpec.layout.keypad.horizontal_gap_px * compactFactor))
+      const compactFactor = viewportH <= 620 ? 0.62 : viewportH <= 700 ? 0.72 : viewportH <= 820 ? 0.86 : viewportH <= 940 ? 0.9 : 1
+      const nextGap = Math.max(1, Math.round(calcSpec.layout.keypad.horizontal_gap_px * compactFactor))
 
       const base = (width - nextGap * (cols - 1)) / cols
       const baseByHeight = (height - nextGap * (rows - 1)) / rows
-      const fromWidth = base * 0.95
+      const fromWidth = base * 1
       const fromHeight = baseByHeight * 1.08
       const nextSize = Math.max(34, Math.min(fromWidth, fromHeight))
       setGap(nextGap)
