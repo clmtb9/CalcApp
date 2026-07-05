@@ -54,6 +54,26 @@ jobs:
           cp -r dist/* .gh-pages/
           touch .gh-pages/.nojekyll
 
+          # Compatibility aliases: stale cached index.html can reference old hashed
+          # bundle names. Mirror current bundle to known legacy names so users still
+          # receive latest code until cache catches up.
+          latest_js=$(ls .gh-pages/assets/index-*.js | head -n 1)
+          latest_css=$(ls .gh-pages/assets/index-*.css | head -n 1)
+
+          for legacy_js in \
+            index-t84bUgAq.js \
+            index-nFKMvW-d.js \
+            index-CJey--hw.js \
+            index-f8apfsFO.js; do
+            cp "$latest_js" ".gh-pages/assets/$legacy_js"
+          done
+
+          for legacy_css in \
+            index-lH60ypsK.css \
+            index-AYpm_WVJ.css; do
+            cp "$latest_css" ".gh-pages/assets/$legacy_css"
+          done
+
           cd .gh-pages
           git add --all
 
