@@ -42,9 +42,11 @@ export function Keypad({ shiftOn, onPress, onOpenFormulas, onButtonSizeChange }:
   const holdIntervalRef = useRef<number | null>(null)
   const suppressClickRef = useRef(false)
   const mobileLockedWidthRef = useRef<number | null>(null)
+  const flashTimeoutRef = useRef<number | null>(null)
   const [buttonSize, setButtonSize] = useState(58)
   const [columnGap, setColumnGap] = useState(calcSpec.layout.keypad.horizontal_gap_px)
   const [rowGap, setRowGap] = useState(calcSpec.layout.keypad.horizontal_gap_px)
+  const [flashKeyId, setFlashKeyId] = useState<string | null>(null)
 
   const stopHoldRepeat = () => {
     if (holdTimeoutRef.current !== null) {
@@ -80,8 +82,22 @@ export function Keypad({ shiftOn, onPress, onOpenFormulas, onButtonSizeChange }:
   useEffect(() => {
     return () => {
       stopHoldRepeat()
+      if (flashTimeoutRef.current !== null) {
+        window.clearTimeout(flashTimeoutRef.current)
+      }
     }
   }, [])
+
+  const triggerKeyFlash = (keyId: string) => {
+    setFlashKeyId(keyId)
+    if (flashTimeoutRef.current !== null) {
+      window.clearTimeout(flashTimeoutRef.current)
+    }
+    flashTimeoutRef.current = window.setTimeout(() => {
+      setFlashKeyId((prev) => (prev === keyId ? null : prev))
+      flashTimeoutRef.current = null
+    }, 260)
+  }
 
   useEffect(() => {
     const element = containerRef.current
@@ -150,11 +166,15 @@ export function Keypad({ shiftOn, onPress, onOpenFormulas, onButtonSizeChange }:
         rowGap: `${rowGap}px`,
       }}
     >
-      {keypadMap.flat().map((label) => {
+      {keypadMap.flat().map((label, index) => {
+        const keyId = `${label}-${index}`
         const classes = ['key-btn']
         const toneClass = getKeyToneClass(label)
         if (toneClass) {
           classes.push(toneClass)
+        }
+        if (flashKeyId === keyId) {
+          classes.push('key-btn-flash')
         }
         if (label === 'equals') {
           classes.push('key-equals')
@@ -168,7 +188,7 @@ export function Keypad({ shiftOn, onPress, onOpenFormulas, onButtonSizeChange }:
 
         return (
           <button
-            key={label}
+            key={keyId}
             type="button"
             className={classes.join(' ')}
             style={{
@@ -176,7 +196,10 @@ export function Keypad({ shiftOn, onPress, onOpenFormulas, onButtonSizeChange }:
               height: `${buttonSize}px`,
               fontSize: `${resolveKeyFontSize(buttonSize, label)}px`,
             }}
-            onPointerDown={() => startHoldRepeat(label)}
+            onPointerDown={() => {
+              triggerKeyFlash(keyId)
+              startHoldRepeat(label)
+            }}
             onPointerUp={stopHoldRepeat}
             onPointerCancel={stopHoldRepeat}
             onPointerLeave={stopHoldRepeat}

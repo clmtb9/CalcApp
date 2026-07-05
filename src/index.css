@@ -498,6 +498,9 @@ body {
 }
 
 .key-btn {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
   border-radius: 999px;
   border: 0;
   background: var(--key-base);
@@ -505,6 +508,54 @@ body {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 16px;
   cursor: pointer;
+}
+
+.key-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.12) 36%, rgba(255, 255, 255, 0) 72%);
+  transform: scale(0.2);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.key-btn-flash {
+  animation: key-press-pulse 220ms cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+.key-btn-flash::after {
+  animation: key-press-flash 280ms cubic-bezier(0.12, 0.84, 0.32, 1);
+}
+
+@keyframes key-press-pulse {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  45% {
+    transform: scale(0.96);
+    filter: brightness(1.14);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes key-press-flash {
+  0% {
+    opacity: 0;
+    transform: scale(0.25);
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.4);
+  }
 }
 
 .key-equals {
