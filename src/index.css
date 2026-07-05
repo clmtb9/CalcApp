@@ -283,6 +283,7 @@ body {
 
 .result-zone {
   margin-top: auto;
+  transform: translateY(8px);
   padding-bottom: 0;
   padding-left: 6px;
   padding-right: 6px;
@@ -371,7 +372,6 @@ body {
   font-weight: 600;
   letter-spacing: 0.15px;
   color: var(--result-ok);
-  transform: translateY(4px);
 }
 
 .result-sub-switchable {
