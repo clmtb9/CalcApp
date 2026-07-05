@@ -27,10 +27,27 @@ function App() {
   const handleMaj = async () => {
     VOLATILE_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key))
 
+    if ('caches' in window) {
+      try {
+        const keys = await caches.keys()
+        await Promise.all(keys.map((key) => caches.delete(key)))
+      } catch {
+        // Continue with update flow even if cache purge fails.
+      }
+    }
+
     if ('serviceWorker' in navigator) {
       try {
         const registrations = await navigator.serviceWorker.getRegistrations()
-        await Promise.all(registrations.map((registration) => registration.update()))
+        await Promise.all(
+          registrations.map(async (registration) => {
+            if (registration.waiting) {
+              registration.waiting.postMessage({ type: 'SKIP_WAITING' })
+            }
+            await registration.update()
+            await registration.unregister()
+          }),
+        )
       } catch {
         // Continue with reload even if SW update fails.
       }

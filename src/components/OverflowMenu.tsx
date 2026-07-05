@@ -52,8 +52,14 @@ export function OverflowMenu({
         >
           Formules
         </button>
-        <button type="button" role="menuitem" className="status-menu-item" onClick={onRefreshApp}>
-          MAJ
+        <button
+          type="button"
+          role="menuitem"
+          className="status-menu-item"
+          title="Force le chargement de la nouvelle mise en page"
+          onClick={onRefreshApp}
+        >
+          MAJ FORCEE
         </button>
         {isOffline ? <div className="status-menu-offline">Offline</div> : null}
       </div>
