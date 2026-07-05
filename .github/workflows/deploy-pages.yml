@@ -6,14 +6,16 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -34,57 +36,18 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Publish to gh-pages branch
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
 
-          if git ls-remote --exit-code --heads origin gh-pages > /dev/null; then
-            git worktree add -B gh-pages .gh-pages origin/gh-pages
-          else
-            git worktree add --detach .gh-pages
-            cd .gh-pages
-            git checkout --orphan gh-pages
-            cd ..
-          fi
-
-          rm -rf .gh-pages/*
-          cp -r dist/* .gh-pages/
-          touch .gh-pages/.nojekyll
-
-          # Compatibility aliases: stale cached index.html can reference old hashed
-          # bundle names. Mirror current bundle to known legacy names so users still
-          # receive latest code until cache catches up.
-          latest_js=$(ls .gh-pages/assets/index-*.js | head -n 1)
-          latest_css=$(ls .gh-pages/assets/index-*.css | head -n 1)
-
-          for legacy_js in \
-            index-t84bUgAq.js \
-            index-nFKMvW-d.js \
-            index-CJey--hw.js \
-            index-f8apfsFO.js; do
-            if [ "$(basename "$latest_js")" != "$legacy_js" ]; then
-              cp "$latest_js" ".gh-pages/assets/$legacy_js"
-            fi
-          done
-
-          for legacy_css in \
-            index-lH60ypsK.css \
-            index-AYpm_WVJ.css; do
-            if [ "$(basename "$latest_css")" != "$legacy_css" ]; then
-              cp "$latest_css" ".gh-pages/assets/$legacy_css"
-            fi
-          done
-
-          cd .gh-pages
-          git add --all
-
-          if git diff --cached --quiet; then
-            echo "No changes to deploy"
-            exit 0
-          fi
-
-          git commit -m "Deploy from ${GITHUB_SHA}"
-          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages --force
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
