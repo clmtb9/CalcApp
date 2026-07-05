@@ -281,7 +281,7 @@ export function ScreenCard({
       <div className="status-row">
         <button
           type="button"
-          className="status-toggle-btn"
+          className={state.angleMode === 'rad' ? 'status-toggle-btn status-toggle-btn-rad-active' : 'status-toggle-btn'}
           onClick={() => onSetAngleMode(nextAngleMode)}
           title={`Basculer vers ${nextAngleMode.toUpperCase()}`}
         >

@@ -152,6 +152,10 @@ body {
   border-color: color-mix(in srgb, var(--expr-par) 55%, var(--border) 45%);
 }
 
+.status-toggle-btn-rad-active {
+  color: #ff6b6b;
+}
+
 .status-menu-wrap {
   position: relative;
 }
@@ -559,12 +563,6 @@ body {
 
 .key-shift {
   --key-flash-color: rgba(232, 112, 58, 0.68);
-}
-
-.key-rad {
-  --key-flash-color: rgba(255, 122, 122, 0.68);
-  color: #ff7a7a;
-  text-shadow: 0 0 8px rgba(255, 122, 122, 0.25);
 }
 
 .key-equals.key-tone-op {
