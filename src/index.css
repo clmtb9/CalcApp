@@ -498,6 +498,7 @@ body {
 }
 
 .key-btn {
+  --key-flash-color: rgba(255, 255, 255, 0.45);
   position: relative;
   overflow: hidden;
   isolation: isolate;
@@ -508,6 +509,7 @@ body {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 16px;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .key-btn::after {
@@ -515,10 +517,46 @@ body {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.12) 36%, rgba(255, 255, 255, 0) 72%);
+  background: radial-gradient(circle, var(--key-flash-color) 0%, color-mix(in srgb, var(--key-flash-color) 35%, transparent 65%) 36%, rgba(255, 255, 255, 0) 72%);
   transform: scale(0.2);
   opacity: 0;
   pointer-events: none;
+}
+
+.key-btn:focus {
+  outline: none;
+}
+
+.key-btn:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--key-flash-color) 42%, transparent 58%);
+}
+
+.key-tone-op {
+  --key-flash-color: rgba(255, 212, 90, 0.65);
+}
+
+.key-tone-fn {
+  --key-flash-color: rgba(123, 216, 255, 0.65);
+}
+
+.key-tone-mode {
+  --key-flash-color: rgba(255, 228, 143, 0.62);
+}
+
+.key-tone-system {
+  --key-flash-color: rgba(255, 176, 176, 0.62);
+}
+
+.key-tone-const {
+  --key-flash-color: rgba(143, 242, 185, 0.62);
+}
+
+.key-equals {
+  --key-flash-color: rgba(232, 112, 58, 0.68);
+}
+
+.key-shift {
+  --key-flash-color: rgba(232, 112, 58, 0.68);
 }
 
 .key-btn-flash {
