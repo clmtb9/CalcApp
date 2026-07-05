@@ -40,8 +40,7 @@ export function Keypad({ shiftOn, onPress, onButtonSizeChange }: KeypadProps) {
   const holdTimeoutRef = useRef<number | null>(null)
   const holdIntervalRef = useRef<number | null>(null)
   const suppressClickRef = useRef(false)
-  const stabilizedSizeRef = useRef<number | null>(null)
-  const stabilizedWidthRef = useRef<number>(0)
+  const mobileLockedWidthRef = useRef<number | null>(null)
   const [buttonSize, setButtonSize] = useState(58)
   const [columnGap, setColumnGap] = useState(calcSpec.layout.keypad.horizontal_gap_px)
   const [rowGap, setRowGap] = useState(calcSpec.layout.keypad.horizontal_gap_px)
@@ -95,9 +94,10 @@ export function Keypad({ shiftOn, onPress, onButtonSizeChange }: KeypadProps) {
       const cols = calcSpec.layout.keypad.cols
       const rows = calcSpec.layout.keypad.rows
       const viewportW = window.innerWidth
+      const isMobile = viewportW <= 700
 
       const compactFactor = height <= 280 ? 0.58 : height <= 340 ? 0.68 : height <= 430 ? 0.82 : height <= 520 ? 0.88 : 1
-      const nextRowGap = Math.max(0, Math.round(calcSpec.layout.keypad.horizontal_gap_px * compactFactor * 0.75))
+      const nextRowGap = isMobile ? 0 : Math.max(0, Math.round(calcSpec.layout.keypad.horizontal_gap_px * compactFactor * 0.75))
       const widthFactor = viewportW <= 380 ? 0 : viewportW <= 420 ? 0.08 : viewportW <= 480 ? 0.15 : viewportW <= 700 ? 0.25 : 0.5
       const nextColumnGap = Math.max(0, Math.round(calcSpec.layout.keypad.horizontal_gap_px * compactFactor * widthFactor))
 
@@ -105,31 +105,21 @@ export function Keypad({ shiftOn, onPress, onButtonSizeChange }: KeypadProps) {
       const baseByHeight = (height - nextRowGap * (rows - 1)) / rows
       const fromWidth = base * 1
       const fromHeight = baseByHeight * 1.08
-      const mobileHeightFloor = viewportW <= 700 ? fromWidth * 0.84 : 0
-      const stabilizedByHeight = Math.max(fromHeight, mobileHeightFloor)
-      const computedSize = Math.max(34, Math.min(fromWidth, stabilizedByHeight))
+      let nextSize = Math.max(34, Math.min(fromWidth, fromHeight))
 
-      let nextSize = computedSize
-      if (viewportW <= 700) {
-        if (stabilizedSizeRef.current === null) {
-          stabilizedSizeRef.current = computedSize
-          stabilizedWidthRef.current = width
-        } else {
-          const widthShift = Math.abs(width - stabilizedWidthRef.current)
-          if (widthShift > 28) {
-            stabilizedSizeRef.current = computedSize
-            stabilizedWidthRef.current = width
-          } else {
-            // Keep first good size on mobile; allow tiny downward drift only.
-            nextSize = Math.max(computedSize, stabilizedSizeRef.current - 2)
-            if (nextSize > stabilizedSizeRef.current) {
-              stabilizedSizeRef.current = nextSize
-            }
-          }
+      if (isMobile) {
+        if (mobileLockedWidthRef.current === null) {
+          mobileLockedWidthRef.current = width
+        } else if (Math.abs(width - mobileLockedWidthRef.current) > 40) {
+          mobileLockedWidthRef.current = width
         }
+
+        const lockedWidth = mobileLockedWidthRef.current ?? width
+        const lockedBase = (lockedWidth - nextColumnGap * (cols - 1)) / cols
+        const lockedSize = lockedBase * 1.02
+        nextSize = Math.max(50, Math.min(76, lockedSize))
       } else {
-        stabilizedSizeRef.current = null
-        stabilizedWidthRef.current = width
+        mobileLockedWidthRef.current = null
       }
 
       setColumnGap(nextColumnGap)
