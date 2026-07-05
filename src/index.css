@@ -283,7 +283,7 @@ body {
 
 .result-zone {
   margin-top: auto;
-  padding-bottom: 6px;
+  padding-bottom: 0;
   padding-left: 6px;
   padding-right: 6px;
   height: 60px;
