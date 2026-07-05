@@ -1171,6 +1171,15 @@ body {
     grid-template-columns: 1fr 1fr;
   }
 
+  .calc-root {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  .screen-card {
+    max-height: 38svh;
+  }
+
   .top-tab-maj {
     min-width: 0;
   }
@@ -1202,8 +1211,6 @@ body {
 @media (max-height: 700px) {
   .calc-root {
     padding-top: 8px;
-    padding-left: 12px;
-    padding-right: 12px;
   }
 
   .header-texts h1 {
@@ -1223,8 +1230,6 @@ body {
 @media (max-height: 620px) {
   .calc-root {
     padding-top: 6px;
-    padding-left: 10px;
-    padding-right: 10px;
   }
 
   .calc-header {
