@@ -229,7 +229,7 @@ function displayLabel(raw: string, shiftOn: boolean): string {
     plus: '+',
     backspace: '⌫',
     equals: '=',
-    sci_E: 'Formules',
+    sci_E: 'form.',
     inv: 'INV',
     sqrt: '√',
     rad: '<',
