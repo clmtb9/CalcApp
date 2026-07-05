@@ -99,10 +99,10 @@ export function Keypad({ shiftOn, onPress, onButtonSizeChange }: KeypadProps) {
 
       const compactFactor = height <= 280 ? 0.58 : height <= 340 ? 0.68 : height <= 430 ? 0.82 : height <= 520 ? 0.88 : 1
       const nextRowGap = isMobile
-        ? Math.max(6, Math.round(baseGap * compactFactor * 0.88))
-        : Math.max(8, Math.round(baseGap * compactFactor * 1.45))
+        ? Math.max(6, Math.round(baseGap * compactFactor * 0.88)) + 2
+        : Math.max(8, Math.round(baseGap * compactFactor * 1.45)) + 2
       const widthFactor = viewportW <= 380 ? 0.3 : viewportW <= 420 ? 0.38 : viewportW <= 480 ? 0.5 : viewportW <= 700 ? 0.62 : 0.84
-      const nextColumnGap = Math.max(isMobile ? 5 : 8, Math.round(baseGap * compactFactor * widthFactor)) + 2
+      const nextColumnGap = Math.max(isMobile ? 5 : 8, Math.round(baseGap * compactFactor * widthFactor)) + 4
 
       const base = (width - nextColumnGap * (cols - 1)) / cols
       const baseByHeight = (height - nextRowGap * (rows - 1)) / rows
@@ -125,6 +125,8 @@ export function Keypad({ shiftOn, onPress, onButtonSizeChange }: KeypadProps) {
       } else {
         mobileLockedWidthRef.current = null
       }
+
+      nextSize = Math.max(30, nextSize - 5)
 
       setColumnGap(nextColumnGap)
       setRowGap(nextRowGap)
