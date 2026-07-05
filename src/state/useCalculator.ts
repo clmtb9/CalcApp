@@ -87,8 +87,9 @@ function applyDisplayFormatting(args: {
   const cleanedMain = normalizeResultForClipboard(resultMain)
   const numericMain = Number(cleanedMain)
   if (cleanedMain && Number.isFinite(numericMain)) {
+    const mainPrefix = isFormattedValueExact(resultNumeric, formatted) ? '=' : '~'
     return {
-      resultMain: `= ${formatted}`,
+      resultMain: `${mainPrefix} ${formatted}`,
       resultSub: '',
       isError,
       resultNumeric,
