@@ -54,10 +54,24 @@ export function resolveButtonInsert(label: string, shiftOn: boolean): ResolvedIn
     return null
   }
 
+  if (label === '^') {
+    return {
+      action: {
+        type: 'INSERT',
+        value: shiftOn ? '^' : '^2',
+        kind: shiftOn ? 'operator' : 'symbol',
+      },
+      consumeShift: shiftOn,
+    }
+  }
+
   let insertValue = normalized
   let consumeShift = false
 
-  if (shiftOn && typeof shiftMapping[label] === 'string') {
+  if (label === 'sqrt') {
+    insertValue = normalized
+    consumeShift = false
+  } else if (shiftOn && typeof shiftMapping[label] === 'string') {
     insertValue = shiftMapping[label] as string
     consumeShift = Boolean(shiftMapping.consume_shift_after_insert)
   }

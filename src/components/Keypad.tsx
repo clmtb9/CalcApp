@@ -3,6 +3,7 @@ import { calcSpec, keypadMap } from '../spec/spec'
 
 interface KeypadProps {
   shiftOn: boolean
+  blackKeysEnabled?: boolean
   onPress: (label: string) => void
   onOpenFormulas?: () => void
   onOpenSettings?: () => void
@@ -10,15 +11,19 @@ interface KeypadProps {
 }
 
 const OPERATOR_KEYS = new Set(['divide', 'times', 'minus', 'plus', '^', '%', '.', '(', ')'])
-const FUNCTION_KEYS = new Set(['sin', 'cos', 'tan', 'log', 'ln', 'sqrt', '!'])
+const FUNCTION_KEYS = new Set(['log', 'ln', 'sqrt', '!'])
 const MODE_KEYS = new Set(['rad', 'deg', 'inv'])
 const SYSTEM_KEYS = new Set(['AC', 'backspace'])
 const CONSTANT_KEYS = new Set(['pi', 'e'])
 const DARKER_KEYS = new Set(['AC', '%', 'backspace', 'divide', 'times', 'plus', 'minus'])
+const TRIGO_KEYS = new Set(['sin', 'cos', 'tan'])
 
 function getKeyToneClass(label: string): string {
   if (/^\d$/.test(label)) {
     return ''
+  }
+  if (TRIGO_KEYS.has(label)) {
+    return 'key-tone-trigo'
   }
   if (FUNCTION_KEYS.has(label)) {
     return 'key-tone-fn'
@@ -38,7 +43,7 @@ function getKeyToneClass(label: string): string {
   return 'key-tone-op'
 }
 
-export function Keypad({ shiftOn, onPress, onOpenFormulas, onOpenSettings, onButtonSizeChange }: KeypadProps) {
+export function Keypad({ shiftOn, blackKeysEnabled = false, onPress, onOpenFormulas, onOpenSettings, onButtonSizeChange }: KeypadProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const holdTimeoutRef = useRef<number | null>(null)
   const holdIntervalRef = useRef<number | null>(null)
@@ -162,7 +167,7 @@ export function Keypad({ shiftOn, onPress, onOpenFormulas, onOpenSettings, onBut
   return (
     <div
       ref={containerRef}
-      className="keypad"
+      className={blackKeysEnabled ? 'keypad keypad-all-black' : 'keypad'}
       style={{
         columnGap: `${columnGap}px`,
         rowGap: `${rowGap}px`,
@@ -178,6 +183,9 @@ export function Keypad({ shiftOn, onPress, onOpenFormulas, onOpenSettings, onBut
         if (DARKER_KEYS.has(label)) {
           classes.push('key-btn-darker')
         }
+        if (TRIGO_KEYS.has(label)) {
+          classes.push('key-btn-trigo')
+        }
         if (flashKeyId === keyId) {
           classes.push('key-btn-flash')
         }
@@ -186,6 +194,12 @@ export function Keypad({ shiftOn, onPress, onOpenFormulas, onOpenSettings, onBut
         }
         if (label === 'inv' && shiftOn) {
           classes.push('key-shift')
+        }
+        if (label === 'inv') {
+          classes.push('key-inv-white')
+        }
+        if (label === '^' && !shiftOn) {
+          classes.push('key-x2-fn')
         }
         if (label === 'sci_E') {
           classes.push('key-tone-mode')
@@ -264,6 +278,7 @@ function displayLabel(raw: string, shiftOn: boolean): string {
     sci_E: 'form.',
     inv: 'INV',
     sqrt: '√',
+    '^': 'x²',
     rad: '<',
     deg: '>',
   }
@@ -283,11 +298,11 @@ function displayLabel(raw: string, shiftOn: boolean): string {
   if (shiftOn && raw === 'ln') {
     return 'e^x'
   }
-  if (shiftOn && raw === 'sqrt') {
-    return 'x²'
+  if (shiftOn && raw === '^') {
+    return '^'
   }
   if (shiftOn && raw === 'sci_E') {
-    return 'param.'
+    return 'param'
   }
 
   return labels[raw] ?? raw

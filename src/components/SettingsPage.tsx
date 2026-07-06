@@ -7,9 +7,23 @@ interface SettingsPageProps {
   onNavigateTab: (tab: 'calculator' | 'notes' | 'formulas' | 'settings') => void
   onRefreshApp: () => void
   buildLabel: string
+  wakeLockEnabled: boolean
+  onToggleWakeLock: (enabled: boolean) => void
+  blackKeysEnabled: boolean
+  onToggleBlackKeys: (enabled: boolean) => void
 }
 
-export function SettingsPage({ activeTab, isOffline, onNavigateTab, onRefreshApp, buildLabel }: SettingsPageProps) {
+export function SettingsPage({
+  activeTab,
+  isOffline,
+  onNavigateTab,
+  onRefreshApp,
+  buildLabel,
+  wakeLockEnabled,
+  onToggleWakeLock,
+  blackKeysEnabled,
+  onToggleBlackKeys,
+}: SettingsPageProps) {
   const [menuOpen, setMenuOpen] = useState(false)
 
   const handleNavigate = (tab: 'calculator' | 'notes' | 'formulas' | 'settings') => {
@@ -38,7 +52,38 @@ export function SettingsPage({ activeTab, isOffline, onNavigateTab, onRefreshApp
         <div className="settings-list">
           <article className="settings-item">
             <div className="settings-item-title">Ecran</div>
-            <div className="settings-item-text">Wake lock actif quand le navigateur l autorise. Orientation demandee en portrait.</div>
+            <label className="settings-switch" htmlFor="wake-lock-toggle">
+              <span className="settings-switch-label">Wake lock ecran</span>
+              <input
+                id="wake-lock-toggle"
+                type="checkbox"
+                className="settings-switch-input"
+                checked={wakeLockEnabled}
+                onChange={(event) => onToggleWakeLock(event.target.checked)}
+                aria-label="Activer wake lock ecran"
+              />
+              <span className="settings-switch-track" aria-hidden="true" />
+            </label>
+            <div className="settings-item-text">
+              Garde ecran allume pendant usage quand navigateur l autorise. Orientation demandee en portrait.
+            </div>
+          </article>
+
+          <article className="settings-item">
+            <div className="settings-item-title">Clavier</div>
+            <label className="settings-switch" htmlFor="black-keys-toggle">
+              <span className="settings-switch-label">Touches noires</span>
+              <input
+                id="black-keys-toggle"
+                type="checkbox"
+                className="settings-switch-input"
+                checked={blackKeysEnabled}
+                onChange={(event) => onToggleBlackKeys(event.target.checked)}
+                aria-label="Activer fond noir sur toutes les touches"
+              />
+              <span className="settings-switch-track" aria-hidden="true" />
+            </label>
+            <div className="settings-item-text">Force fond noir uniforme sur toutes touches du keypad.</div>
           </article>
 
           <article className="settings-item">

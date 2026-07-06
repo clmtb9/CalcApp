@@ -12,6 +12,7 @@ interface CalculatorProps {
   targetNoteId: string
   resumeCalculation: RecentCalculation | null
   resumeFromNote: { expression: string; angleMode?: 'deg' | 'rad' } | null
+  blackKeysEnabled: boolean
   activeTab: 'calculator' | 'notes' | 'formulas' | 'settings'
   isOffline: boolean
   onNavigateTab: (tab: 'calculator' | 'notes' | 'formulas' | 'settings') => void
@@ -36,6 +37,7 @@ export function Calculator({
   targetNoteId,
   resumeCalculation,
   resumeFromNote,
+  blackKeysEnabled,
   activeTab,
   isOffline,
   onNavigateTab,
@@ -80,6 +82,7 @@ export function Calculator({
 
       <Keypad
         shiftOn={state.shiftOn}
+        blackKeysEnabled={blackKeysEnabled}
         onPress={pressButton}
         onOpenFormulas={() => onNavigateTab('formulas')}
         onOpenSettings={() => {

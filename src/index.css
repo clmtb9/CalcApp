@@ -9,7 +9,8 @@
   --app-background-black: #000;
   --app-background: var(--app-background-black);
   --border: #2d3e5f;
-  --key-base: #2c2c2e;
+  /*--key-base: #2c2c2e;*/
+  --key-base: #ffffff30;
   --expr-fn: #3498db;
   --expr-inv: #e6a817;
   --expr-num: #ecf0f1;
@@ -501,6 +502,7 @@ body {
 
 .key-btn {
   --key-flash-color: rgba(255, 255, 255, 0.45);
+  --key-flash-color: rgba(255, 255, 255, 0.45);
   position: relative;
   overflow: hidden;
   isolation: isolate;
@@ -515,7 +517,8 @@ body {
 }
 
 .key-btn-darker {
-  background: #1f2022;
+  /* background: #1f2022; */
+  background: #ffffff49;
 }
 
 .key-btn::after {
@@ -543,6 +546,10 @@ body {
 
 .key-tone-fn {
   --key-flash-color: rgba(123, 216, 255, 0.65);
+}
+
+.key-tone-trigo {
+  --key-flash-color: rgba(222, 137, 218, 0.65);
 }
 
 .key-tone-mode {
@@ -627,6 +634,12 @@ body {
   text-shadow: 0 0 8px rgba(123, 216, 255, 0.25);
 }
 
+.key-tone-trigo {
+  color: #de89dafd;
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(222, 137, 218, 0.25);
+}
+
 .key-tone-mode {
   color: #ffe48f;
   font-weight: 700;
@@ -643,6 +656,16 @@ body {
   color: #8ff2b9;
   font-weight: 700;
   text-shadow: 0 0 8px rgba(143, 242, 185, 0.25);
+}
+
+.key-btn.key-inv-white {
+  color: #fff;
+  text-shadow: none;
+}
+
+.key-btn.key-x2-fn {
+  color: #7bd8ff;
+  text-shadow: 0 0 8px rgba(123, 216, 255, 0.25);
 }
 
 .expr-fn {
@@ -798,6 +821,17 @@ body {
   gap: 8px;
 }
 
+.formulas-title-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.formula-manage-btn {
+  height: 28px;
+  padding: 0 10px;
+}
+
 .settings-title-row {
   padding: 8px 10px;
   border-bottom: 1px solid var(--border);
@@ -828,6 +862,61 @@ body {
   border-bottom: 0;
 }
 
+.formula-editor {
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+  display: grid;
+  gap: 8px;
+}
+
+.formula-editor-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--expr-par);
+}
+
+.formula-input {
+  width: 100%;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--screen) 94%, #1d3555 6%);
+  color: var(--expr-num);
+  padding: 0 10px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+}
+
+.formula-input-mono {
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.formula-editor-angle-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.formula-angle-btn {
+  height: 28px;
+  font-size: 12px;
+}
+
+.formula-angle-btn-active {
+  border-color: color-mix(in srgb, var(--accent) 70%, var(--border) 30%);
+  background: color-mix(in srgb, var(--accent) 28%, var(--screen) 72%);
+}
+
+.formula-editor-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.formula-editor-actions .note-btn:disabled {
+  opacity: 0.5;
+}
+
 .formulas-list {
   min-height: 0;
   overflow: auto;
@@ -853,6 +942,15 @@ body {
   gap: 4px;
 }
 
+.formula-item-clickable {
+  cursor: pointer;
+}
+
+.formula-item-clickable:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 65%, #fff 35%);
+  outline-offset: 2px;
+}
+
 .settings-item {
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -874,6 +972,68 @@ body {
   line-height: 1.4;
 }
 
+.settings-switch {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings-switch-label {
+  font-size: 12px;
+  color: var(--expr-num);
+}
+
+.settings-switch-input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.settings-switch-track {
+  width: 42px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--screen) 95%, #1d3555 5%);
+  position: relative;
+  transition: background 140ms ease, border-color 140ms ease;
+}
+
+.settings-switch-track::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--expr-num);
+  transition: transform 140ms ease;
+}
+
+.settings-switch-input:checked + .settings-switch-track {
+  background: color-mix(in srgb, var(--accent) 55%, #1d3555 45%);
+  border-color: color-mix(in srgb, var(--accent) 70%, var(--border) 30%);
+}
+
+.settings-switch-input:checked + .settings-switch-track::after {
+  transform: translateX(18px);
+}
+
+.settings-switch-input:focus-visible + .settings-switch-track {
+  outline: 2px solid color-mix(in srgb, var(--accent) 65%, #fff 35%);
+  outline-offset: 2px;
+}
+
+.keypad.keypad-all-black .key-btn,
+.keypad.keypad-all-black .key-btn-darker,
+.keypad.keypad-all-black .key-equals,
+.keypad.keypad-all-black .key-shift {
+  background: #000000;
+}
+
 .settings-actions {
   grid-template-columns: 1fr;
   gap: 8px;
@@ -881,14 +1041,29 @@ body {
 
 .formula-item-head {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 8px;
-  align-items: center;
+  align-items: start;
 }
 
 .formula-item-head .note-btn {
   height: 28px;
   padding: 0 10px;
+}
+
+.formula-item-actions {
+  display: grid;
+  grid-auto-flow: column;
+  gap: 6px;
+}
+
+.formula-item-icon-btn {
+  width: 30px;
+  min-width: 30px;
+  height: 28px;
+  padding: 0;
+  font-size: 15px;
+  line-height: 1;
 }
 
 .formula-item-title {

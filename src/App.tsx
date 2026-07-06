@@ -7,6 +7,8 @@ import { useNotes } from './notes/useNotes'
 import type { RecentCalculation } from './state/history'
 
 const VOLATILE_STORAGE_KEYS = ['scientific-calculator-history']
+const WAKE_LOCK_ENABLED_KEY = 'scientific-calculator-wake-lock-enabled'
+const BLACK_KEYS_ENABLED_KEY = 'scientific-calculator-black-keys-enabled'
 const BUILD_LABEL = `v${__BUILD_ID__}`
 
 type WakeLockSentinelLike = {
@@ -27,6 +29,17 @@ type ScreenOrientationWithLock = ScreenOrientation & {
 function App() {
   const [activeTab, setActiveTab] = useState<'calculator' | 'notes' | 'formulas' | 'settings'>('calculator')
   const [isOffline, setIsOffline] = useState(() => !navigator.onLine)
+  const [wakeLockEnabled, setWakeLockEnabled] = useState(() => {
+    const raw = localStorage.getItem(WAKE_LOCK_ENABLED_KEY)
+    if (raw === null) {
+      return true
+    }
+    return raw === '1'
+  })
+  const [blackKeysEnabled, setBlackKeysEnabled] = useState(() => {
+    const raw = localStorage.getItem(BLACK_KEYS_ENABLED_KEY)
+    return raw === '1'
+  })
   const [resumeCalculation, setResumeCalculation] = useState<RecentCalculation | null>(null)
   const [resumeFromNote, setResumeFromNote] = useState<{ expression: string; angleMode?: 'deg' | 'rad' } | null>(null)
   const {
@@ -89,8 +102,37 @@ function App() {
   }, [])
 
   useEffect(() => {
+    localStorage.setItem(WAKE_LOCK_ENABLED_KEY, wakeLockEnabled ? '1' : '0')
+  }, [wakeLockEnabled])
+
+  useEffect(() => {
+    localStorage.setItem(BLACK_KEYS_ENABLED_KEY, blackKeysEnabled ? '1' : '0')
+  }, [blackKeysEnabled])
+
+  useEffect(() => {
+    const lockOrientation = async () => {
+      const orientation = screen.orientation as ScreenOrientationWithLock | undefined
+      if (!orientation?.lock) {
+        return
+      }
+
+      try {
+        await orientation.lock('portrait')
+      } catch {
+        // Ignore unsupported or user-gesture restricted orientation locks.
+      }
+    }
+
+    void lockOrientation()
+  }, [])
+
+  useEffect(() => {
     let wakeLock: WakeLockSentinelLike | null = null
     let disposed = false
+
+    if (!wakeLockEnabled) {
+      return
+    }
 
     const requestWakeLock = async () => {
       const navigatorWithWakeLock = navigator as NavigatorWithWakeLock
@@ -105,19 +147,6 @@ function App() {
       }
     }
 
-    const lockOrientation = async () => {
-      const orientation = screen.orientation as ScreenOrientationWithLock | undefined
-      if (!orientation?.lock) {
-        return
-      }
-
-      try {
-        await orientation.lock('portrait')
-      } catch {
-        // Ignore unsupported or user-gesture restricted orientation locks.
-      }
-    }
-
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible' && !disposed) {
         void requestWakeLock()
@@ -125,7 +154,6 @@ function App() {
     }
 
     void requestWakeLock()
-    void lockOrientation()
     document.addEventListener('visibilitychange', handleVisibilityChange)
 
     return () => {
@@ -135,7 +163,7 @@ function App() {
         void wakeLock.release()
       }
     }
-  }, [])
+  }, [wakeLockEnabled])
 
   return (
     <div className="app-shell">
@@ -148,6 +176,7 @@ function App() {
           targetNoteId={activeNoteId}
           resumeCalculation={resumeCalculation}
           resumeFromNote={resumeFromNote}
+          blackKeysEnabled={blackKeysEnabled}
           activeTab={activeTab}
           isOffline={isOffline}
           onNavigateTab={setActiveTab}
@@ -216,6 +245,10 @@ function App() {
           onNavigateTab={setActiveTab}
           onRefreshApp={handleMaj}
           buildLabel={BUILD_LABEL}
+          wakeLockEnabled={wakeLockEnabled}
+          onToggleWakeLock={setWakeLockEnabled}
+          blackKeysEnabled={blackKeysEnabled}
+          onToggleBlackKeys={setBlackKeysEnabled}
         />
       )}
     </div>
